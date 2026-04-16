@@ -1,5 +1,4 @@
 import prisma from "../lib/prisma.js";
-
 class AuthService {
   async register(name, email, password, role) {
     const user = await prisma.user.create({
