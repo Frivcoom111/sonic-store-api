@@ -1,12 +1,8 @@
 import app from "./src/app.js";
-import "dotenv/config"
-import prisma from "./src/lib/prisma.js";
+import "dotenv/config";
 
-const PORT = process.env.PORT;
-
-const teste = await prisma.user.findMany()
-console.log("Conexão OK:", teste)
+const PORT = process.env.PORT || 3000;
 
 app.listen(PORT, () => {
-    console.log(`Servidor rodando: ${PORT}`);
-})
+  console.log(`Servidor rodando na porta: ${PORT}`);
+});
