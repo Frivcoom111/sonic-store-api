@@ -4,10 +4,10 @@ import { compareHashPassword } from "../utils/compareHashPassword.js";
 import { generateHashPassword } from "../utils/generateHashPassword.js";
 import { generateToken } from "../utils/generateToken.js";
 class AuthService {
-  async register(name, email, password, role) {
+  async register({ name, email, password }) {
     try {
       // Validação dos dados.
-      if (!name || !email || !password || !role) {
+      if (!name || !email || !password) {
         throw new Error("Todos os campos são obrigatórios.");
       }
 
@@ -22,7 +22,7 @@ class AuthService {
           name: name,
           email: normalizedEmail,
           password: hashPassword,
-          role: role,
+          role: "USER",
         },
         select: {
           name: true,
@@ -42,7 +42,7 @@ class AuthService {
     }
   }
 
-  async login(email, password) {
+  async login({ email, password }) {
     // Validação dos dados.
     if (!email || !password)
       throw new Error("Todos os campos são obrigatórios.");
