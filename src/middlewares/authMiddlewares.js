@@ -1,7 +1,8 @@
 import "dotenv/config";
 import jwt from "jsonwebtoken";
+import { getRequiredEnv } from "../utils/getRequeridEnv.js";
 
-const JWT_SECRET = process.env.JWT_SECRET;
+const JWT_SECRET = getRequiredEnv("JWT_SECRET");
 
 export const authToken = async (req, res, next) => {
   try {
