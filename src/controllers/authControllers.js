@@ -35,7 +35,7 @@ class AuthController {
 
       // Lançamento dos erros do zod.
       if (!validation.success) {
-        return res.status(400).json({error: validation.error.format()});
+        return res.status(400).json({ error: validation.error.format() });
       }
 
       const { email, password } = validation.data;
@@ -45,17 +45,29 @@ class AuthController {
         password,
       });
 
-      res
-        .status(200)
-        .json({ message: "Login feito com sucesso.", token: user.token, user: user.user });
+      res.status(200).json({
+        message: "Login feito com sucesso.",
+        token: user.token,
+        user: user.user,
+      });
     } catch (error) {
       next(error);
     }
   }
 
-//   async getUser(req, res, next) {
+  async getUser(req, res, next) {
+    try {
+      const id = req.user.id;
+      if (!id) throw new Error("ID usuário inválido.");
 
-//   }
+      const user = await authService.getUser(id);
+      if (!user) throw new Error("Erro ao buscar usuário.");
+
+      res.status(200).json({ user });
+    } catch (error) {
+      next(error);
+    }
+  }
 }
 
 export default new AuthController();

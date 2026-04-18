@@ -1,4 +1,3 @@
-import { empty } from "@prisma/client/runtime/client";
 import prisma from "../lib/prisma.js";
 import { compareHashPassword } from "../utils/compareHashPassword.js";
 import { generateHashPassword } from "../utils/generateHashPassword.js";
@@ -6,11 +5,6 @@ import { generateToken } from "../utils/generateToken.js";
 class AuthService {
   async register({ name, email, password }) {
     try {
-      // Validação dos dados.
-      if (!name || !email || !password) {
-        throw new Error("Todos os campos são obrigatórios.");
-      }
-
       // Normalizando o email
       const normalizedEmail = email.toLowerCase().trim();
 
@@ -43,10 +37,6 @@ class AuthService {
   }
 
   async login({ email, password }) {
-    // Validação dos dados.
-    if (!email || !password)
-      throw new Error("Todos os campos são obrigatórios.");
-
     // Normalizando o email
     const normalizedEmail = email.toLowerCase().trim();
 

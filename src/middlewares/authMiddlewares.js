@@ -1,11 +1,24 @@
-export const auth = async (req, res, next) => {
-    try {
-        const headerAuthorization = req.headers.authorization;
+import "dotenv/config";
+import jwt from "jsonwebtoken";
 
-        
+const JWT_SECRET = process.env.JWT_SECRET;
 
-        next()
-    } catch (error) {
-        res.status(401).json({ message: "Token inválido ou expirado" });
+export const authToken = async (req, res, next) => {
+  try {
+    const headerAuthorization = req.headers.authorization;
+
+    // Verificação do token JWT.
+    if (!headerAuthorization || !headerAuthorization.startsWith("Bearer ")) {
+      return res.status(401).json({ message: "Token não fornecido" });
     }
-}
+
+    const token = headerAuthorization.split(" ")[1];
+
+    const decoded = jwt.verify(token, JWT_SECRET);
+    req.user = decoded; // { id, role }
+
+    next();
+  } catch (error) {
+    res.status(401).json({ message: "Token inválido ou expirado" });
+  }
+};
