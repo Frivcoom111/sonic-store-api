@@ -2,7 +2,7 @@ import z from "zod";
 
 const passwordSchema = z
   .string()
-  .min(8, "Senha mínimo 8 caracteres.")
+  .min(8, "Senha mínima 8 caracteres.")
   .regex(/[A-Z]/, "Senha deve ter pelo menos uma letra maiúscula.")
   .regex(/[a-z]/, "Senha deve ter pelo menos uma letra minúscula.")
   .regex(/[0-9]/, "Senha deve ter pelo menos um número.");
