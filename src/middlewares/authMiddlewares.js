@@ -16,7 +16,11 @@ export const authToken = (req, res, next) => {
     const token = headerAuthorization.split(" ")[1];
 
     const decoded = jwt.verify(token, JWT_SECRET);
-    req.user = decoded; // { id, role }
+
+    // Verifica se o usuário está desativado.
+    if (!decoded.isActive) return res.status(401).json({ message: "Usuário desativado, acesso negado." });
+
+    req.user = decoded; // { id, role, isActive }
 
     next();
   } catch (error) {

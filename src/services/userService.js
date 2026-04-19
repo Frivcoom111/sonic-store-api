@@ -121,7 +121,7 @@ class UserService {
     return updatedUser;
   }
 
-  async disable(id) {
+  async toggle(id, isActive) {
     const user = await prisma.user.findUnique({
       where: {
         id: id,
@@ -135,13 +135,14 @@ class UserService {
     });
 
     if (!user) throw new Error("Usuário não existe.");
+    if (user.isActive === isActive) throw new Error(`Usuário já está ${isActive ? "ativado." : "desativado."}`);
 
-    const userDisable = await prisma.user.update({
+    const userToggle = await prisma.user.update({
       where: {
         id: id,
       },
       data: {
-        isActive: false,
+        isActive: isActive,
       },
       select: {
         name: true,
@@ -151,40 +152,7 @@ class UserService {
       },
     });
 
-    return userDisable;
-  }
-
-  async enable(id) {
-    const user = await prisma.user.findUnique({
-      where: {
-        id: id,
-      },
-      select: {
-        name: true,
-        email: true,
-        role: true,
-        isActive: true,
-      },
-    });
-
-    if (!user) throw new Error("Usuário não existe.");
-
-    const userEnable = await prisma.user.update({
-      where: {
-        id: id,
-      },
-      data: {
-        isActive: true,
-      },
-      select: {
-        name: true,
-        email: true,
-        role: true,
-        isActive: true,
-      },
-    });
-
-    return userEnable;
+    return userToggle;
   }
 }
 

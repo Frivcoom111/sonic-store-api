@@ -92,7 +92,7 @@ class UserController {
     }
   }
 
-  async disable(req, res, next) {
+  async toggle(req, res, next) {
     try {
       let { id } = req.params;
 
@@ -102,31 +102,12 @@ class UserController {
         return res.status(400).json({ error: validation.error.format() });
       }
 
-      id = validation.data.id;
+      const { isActive } = req.body;
+      id = validation.data.id
 
-      const userDisable = await userService.disable(id);
+      const userToggle = await userService.toggle(id, isActive);
 
-      res.status(200).json({ message: "Usuário desativado com sucesso.", userDisable });
-    } catch (error) {
-      next(error);
-    }
-  }
-
-  async enable(req, res, next) {
-    try {
-      let { id } = req.params;
-
-      const validation = userParamsSchema.safeParse({ id });
-
-      if (!validation.success) {
-        return res.status(400).json({ error: validation.error.format() });
-      }
-
-      id = validation.data.id;
-
-      const userEnable = await userService.enable(id);
-
-      res.status(200).json({ message: "Usuário ativado com sucesso.", userEnable });
+      res.status(200).json({ message: "Usuário ativado com sucesso.", userToggle });
     } catch (error) {
       next(error);
     }
