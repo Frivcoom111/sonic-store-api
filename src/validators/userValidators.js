@@ -30,4 +30,4 @@ export const userUpdateRoleSchema = z.object({
 
 export const userParamsSchema = z.object({
   id: z.coerce.number().int().positive("ID inválido."),
-})
+});
