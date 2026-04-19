@@ -4,8 +4,8 @@ import { authToken } from "../middlewares/authMiddlewares.js";
 
 const routes = express.Router();
 
-routes.post("/register", (req, res, next) => authControllers.register(req, res, next));
-routes.post("/login", (req, res, next) => authControllers.login(req, res, next));
-routes.get("/me", authToken, (req, res, next) => authControllers.getUser(req, res, next));
+routes.post("/register", authControllers.register.bind(authControllers));
+routes.post("/login", authControllers.login.bind(authControllers));
+routes.get("/me", authToken, authControllers.getUser.bind(authControllers));
 
 export default routes;

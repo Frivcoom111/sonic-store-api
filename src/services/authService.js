@@ -44,10 +44,21 @@ class AuthService {
       where: {
         email: normalizedEmail,
       },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        password: true,
+        role: true,
+        isActive: true,
+      },
     });
 
     // Validação se o usuário existe.
     if (!user) throw new Error("Email ou senha inválidos.");
+
+    // Validação se o usuário está ativo.
+    if (!user.isActive) throw new Error("Usuário inativo.");
 
     // Validação senha.
     const isMatch = await compareHashPassword(password, user.password);
@@ -62,6 +73,7 @@ class AuthService {
         name: user.name,
         email: user.email,
         role: user.role,
+        isActive: user.isActive,
       },
     };
   }
@@ -89,7 +101,11 @@ class AuthService {
       },
     });
 
+    // Validação se o usuário existe.
     if (!user) throw new Error("Erro ao buscar usuário.");
+
+    // Validação se o usuário está ativo.
+    if (!user.isActive) throw new Error("Usuário inativo.");
 
     return user;
   }

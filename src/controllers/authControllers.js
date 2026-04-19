@@ -20,9 +20,7 @@ class AuthController {
         password,
       });
 
-      res
-        .status(201)
-        .json({ message: "Usuário criado com sucesso.", userCreated });
+      res.status(201).json({ message: "Usuário criado com sucesso.", userCreated });
     } catch (error) {
       next(error);
     }
@@ -61,7 +59,6 @@ class AuthController {
       if (!id) throw new Error("ID usuário inválido.");
 
       const user = await authService.getUser(id);
-      if (!user) throw new Error("Erro ao buscar usuário.");
 
       res.status(200).json({ user });
     } catch (error) {
