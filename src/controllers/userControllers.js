@@ -51,7 +51,7 @@ class UserController {
 
   async updateUserPassword(req, res, next) {
     try {
-      const validation = await userUpdatePasswordSchema.safeParse(req.body);
+      const validation = userUpdatePasswordSchema.safeParse(req.body);
       const id = req.user.id;
 
       if (!validation.success) return res.status(400).json({ error: validation.error.format() });
@@ -68,7 +68,7 @@ class UserController {
 
   async updateUserRole(req, res, next) {
     try {
-      const validation = await userUpdateRoleSchema.safeParse(req.body);
+      const validation = userUpdateRoleSchema.safeParse(req.body);
 
       let { id } = req.params;
 
@@ -87,6 +87,46 @@ class UserController {
       const updatedUser = await userService.updateRole({ id, role });
 
       res.status(200).json({ message: "Papel atualizado com sucesso.", updatedUser });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async disable(req, res, next) {
+    try {
+      let { id } = req.params;
+
+      const validation = userParamsSchema.safeParse({ id });
+
+      if (!validation.success) {
+        return res.status(400).json({ error: validation.error.format() });
+      }
+
+      id = validation.data.id;
+
+      const userDisable = await userService.disable(id);
+
+      res.status(200).json({ message: "Usuário desativado com sucesso.", userDisable });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async enable(req, res, next) {
+    try {
+      let { id } = req.params;
+
+      const validation = userParamsSchema.safeParse({ id });
+
+      if (!validation.success) {
+        return res.status(400).json({ error: validation.error.format() });
+      }
+
+      id = validation.data.id;
+
+      const userEnable = await userService.enable(id);
+
+      res.status(200).json({ message: "Usuário ativado com sucesso.", userEnable });
     } catch (error) {
       next(error);
     }
