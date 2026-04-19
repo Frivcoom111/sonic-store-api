@@ -20,7 +20,7 @@ export const userUpdateSchema = z.object({
 });
 
 export const userUpdatePasswordSchema = z.object({
-  currentPassword: passwordSchema,
+  currentPassword: z.string().min(1, "Senha atual obrigatória."),
   newPassword: passwordSchema,
 });
 
