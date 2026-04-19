@@ -20,9 +20,7 @@ class AuthController {
         password,
       });
 
-      res
-        .status(201)
-        .json({ message: "Usuário criado com sucesso.", userCreated });
+      res.status(201).json({ message: "Usuário criado com sucesso.", userCreated });
     } catch (error) {
       next(error);
     }

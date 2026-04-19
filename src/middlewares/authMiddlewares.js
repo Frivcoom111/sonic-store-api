@@ -4,7 +4,7 @@ import { getRequiredEnv } from "../utils/getRequeridEnv.js";
 
 const JWT_SECRET = getRequiredEnv("JWT_SECRET");
 
-export const authToken = async (req, res, next) => {
+export const authToken = (req, res, next) => {
   try {
     const headerAuthorization = req.headers.authorization;
 
@@ -21,5 +21,19 @@ export const authToken = async (req, res, next) => {
     next();
   } catch (error) {
     res.status(401).json({ message: "Token inválido ou expirado" });
+  }
+};
+
+export const authAdminOnly = (req, res, next) => {
+  try {
+    const role = req.user.role;
+
+    if (!role || role !== "ADMIN") {
+      return res.status(403).json({ message: "Acesso admin negado." });
+    }
+
+    next();
+  } catch (error) {
+    res.status(403).json({ message: "Acesso admin negado." });
   }
 };
