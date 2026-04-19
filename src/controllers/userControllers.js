@@ -72,7 +72,7 @@ class UserController {
 
       let { id } = req.params;
 
-      const validationId = await userParamsSchema.safeParse({ id });
+      const validationId = userParamsSchema.safeParse({ id });
 
       if (!validationId.success) {
         return res.status(400).json({ error: validationId.error.format() });
