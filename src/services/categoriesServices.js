@@ -25,6 +25,14 @@ class CategoriesService {
       throw error;
     }
   }
+
+  async update(id, body) {
+    const allowedFields = ["name"];
+
+    const data = Object.fromEntries(Object.entries(body).filter(([key]) => allowedFields.includes(key)));
+
+    
+  }
 }
 
-export default new CategoriesService;
+export default new CategoriesService();

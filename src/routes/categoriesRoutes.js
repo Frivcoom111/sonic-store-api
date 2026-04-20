@@ -4,6 +4,7 @@ import categoriesControllers from "../controllers/categoriesControllers.js";
 
 const routes = express.Router();
 
+
 routes.post("/", authToken, authAdminOnly, categoriesControllers.createCategory.bind(categoriesControllers));
 
 export default routes;
