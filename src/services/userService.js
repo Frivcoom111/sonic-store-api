@@ -121,7 +121,7 @@ class UserService {
     return updatedUser;
   }
 
-  async toggle(id, isActive) {
+  async toggle({ id, isActive }) {
     const user = await prisma.user.findUnique({
       where: {
         id: id,

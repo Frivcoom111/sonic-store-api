@@ -27,7 +27,3 @@ export const userUpdatePasswordSchema = z.object({
 export const userUpdateRoleSchema = z.object({
   role: z.enum(["ADMIN", "USER"], "Papel inválido."),
 });
-
-export const userParamsSchema = z.object({
-  id: z.coerce.number().int().positive("ID inválido."),
-});

@@ -1,7 +1,7 @@
 import userService from "../services/userService.js";
+import { idParamsSchema } from "../validators/globalValidators.js";
 import {
   userCreateSchema,
-  userParamsSchema,
   userUpdatePasswordSchema,
   userUpdateRoleSchema,
   userUpdateSchema,
@@ -68,11 +68,11 @@ class UserController {
 
   async updateUserRole(req, res, next) {
     try {
+      const { id } = req.params;
+
+      const validationId = idParamsSchema.safeParse({ id });
       const validation = userUpdateRoleSchema.safeParse(req.body);
 
-      let { id } = req.params;
-
-      const validationId = userParamsSchema.safeParse({ id });
 
       if (!validationId.success) {
         return res.status(400).json({ error: validationId.error.format() });
@@ -82,9 +82,8 @@ class UserController {
       }
 
       const { role } = validation.data;
-      id = validationId.data.id;
 
-      const updatedUser = await userService.updateRole({ id, role });
+      const updatedUser = await userService.updateRole({ id: validation.data.id, role });
 
       res.status(200).json({ message: "Papel atualizado com sucesso.", updatedUser });
     } catch (error) {
@@ -94,7 +93,7 @@ class UserController {
 
   async toggle(req, res, next) {
     try {
-      let { id } = req.params;
+      const { id } = req.params;
 
       const validation = userParamsSchema.safeParse({ id });
 
@@ -107,9 +106,8 @@ class UserController {
       }
 
       const { isActive } = req.body;
-      id = validation.data.id;
 
-      const userToggle = await userService.toggle(id, isActive);
+      const userToggle = await userService.toggle({ id: validation.data.id, isActive });
 
       res.status(200).json({ message: "Usuário ativado com sucesso.", userToggle });
     } catch (error) {
