@@ -83,7 +83,7 @@ class UserController {
 
       const { role } = validation.data;
 
-      const updatedUser = await userService.updateRole({ id: validation.data.id, role });
+      const updatedUser = await userService.updateRole({ id: validationId.data.id, role });
 
       res.status(200).json({ message: "Papel atualizado com sucesso.", updatedUser });
     } catch (error) {
@@ -95,17 +95,17 @@ class UserController {
     try {
       const { id } = req.params;
 
-      const validation = userParamsSchema.safeParse({ id });
+      const validation = idParamsSchema.safeParse({ id });
 
       if (!validation.success) {
         return res.status(400).json({ error: validation.error.format() });
       }
 
+      const { isActive } = req.body;
+
       if (typeof isActive !== "boolean") {
         return res.status(400).json({ message: "isActive deve ser um boolean." });
       }
-
-      const { isActive } = req.body;
 
       const userToggle = await userService.toggle({ id: validation.data.id, isActive });
 

@@ -3,7 +3,7 @@ import { categorySchema } from "../validators/categoriesValidators.js";
 import { idParamsSchema } from "../validators/globalValidators.js";
 
 class CategoriesControllers {
-  async createCategory(req, res, nex) {
+  async createCategory(req, res, next) {
     try {
       const validation = categorySchema.safeParse(req.body);
 
@@ -58,7 +58,7 @@ class CategoriesControllers {
 
       res.status(200).json({ message: "Categoria deletada com sucesso.", deletedCategory });
     } catch (error) {
-      nex(error);
+      next(error);
     }
   }
 
