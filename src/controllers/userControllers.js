@@ -102,8 +102,12 @@ class UserController {
         return res.status(400).json({ error: validation.error.format() });
       }
 
+      if (typeof isActive !== "boolean") {
+        return res.status(400).json({ message: "isActive deve ser um boolean." });
+      }
+
       const { isActive } = req.body;
-      id = validation.data.id
+      id = validation.data.id;
 
       const userToggle = await userService.toggle(id, isActive);
 

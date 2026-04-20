@@ -89,6 +89,7 @@ class AuthService {
         name: true,
         email: true,
         role: true,
+        isActive: true,
         addresses: {
           select: {
             state: true,
