@@ -57,8 +57,8 @@ model Address {
 
 model Category {
   id        Int      @id @default(autoincrement())
-  name      String   @db.VarChar(100)
-  slug      String   @db.VarChar(100)
+  name      String   @unique @db.VarChar(100)
+  slug      String   @unique @db.VarChar(100)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
