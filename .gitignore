@@ -4,3 +4,4 @@
 /generated/prisma
 .vscode
 .prettierrc
+.claude
