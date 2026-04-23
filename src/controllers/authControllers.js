@@ -1,4 +1,4 @@
-import authService from "../services/authService.js";
+import authService from "../services/authServices.js";
 import { loginSchema, registerSchema } from "../validators/authValidators.js";
 
 class AuthController {
