@@ -1,4 +1,4 @@
-import userService from "../services/userService.js";
+import userService from "../services/userServices.js";
 import { idParamsSchema } from "../validators/globalValidators.js";
 import {
   userCreateSchema,
