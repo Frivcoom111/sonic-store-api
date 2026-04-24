@@ -1,4 +1,4 @@
-import userService from "../services/userService.js";
+import userService from "../services/userServices.js";
 import { idParamsSchema } from "../validators/globalValidators.js";
 import {
   userCreateSchema,
@@ -72,7 +72,6 @@ class UserController {
 
       const validationId = idParamsSchema.safeParse({ id });
       const validation = userUpdateRoleSchema.safeParse(req.body);
-
 
       if (!validationId.success) {
         return res.status(400).json({ error: validationId.error.format() });
