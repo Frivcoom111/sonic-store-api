@@ -1,0 +1,25 @@
+services:
+  api:
+    build: .
+    ports:
+      - "3000:3000"
+    volumes:
+      - .:/app
+      - /app/node_modules
+    env_file:
+      - .env
+    depends_on:
+      - db
+  db:
+    image: postgres:15
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_USER=sonic
+      - POSTGRES_PASSWORD=sonic123
+      - POSTGRES_DB=sonic_store
+    volumes:
+      - dados_db:/var/lib/postgresql/data
+
+volumes:
+  dados_db:
