@@ -18,9 +18,9 @@ services:
     ports:
       - "5432:5432"
     environment:
-      - POSTGRES_USER=sonic
-      - POSTGRES_PASSWORD=sonic123
-      - POSTGRES_DB=sonic_store
+      - POSTGRES_USER=${POSTGRES_USER:-sonic}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-sonic123}
+      - POSTGRES_DB=${POSTGRES_DB:-sonic_store}
     volumes:
       - dados_db:/var/lib/postgresql/data
     healthcheck:

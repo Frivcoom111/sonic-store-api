@@ -9,7 +9,7 @@ COPY package*.json ./
 COPY prisma ./prisma
 
 # Instalando todas as dependências do projeto
-RUN npm install
+RUN npm ci
 RUN npx prisma generate
 
 COPY . .
