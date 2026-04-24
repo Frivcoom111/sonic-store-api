@@ -73,7 +73,6 @@ class UserController {
       const validationId = idParamsSchema.safeParse({ id });
       const validation = userUpdateRoleSchema.safeParse(req.body);
 
-
       if (!validationId.success) {
         return res.status(400).json({ error: validationId.error.format() });
       }
