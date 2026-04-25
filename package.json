@@ -7,6 +7,9 @@
     "dev": "nodemon server.js",
     "start:dev": "npx prisma migrate deploy && npx prisma generate && nodemon server.js"
   },
+  "prisma": {
+    "seed": "node prisma/seeds.js"
+  },
   "keywords": [],
   "author": "Carlos Eduardo Tolentino Faustino dos Santos",
   "license": "ISC",

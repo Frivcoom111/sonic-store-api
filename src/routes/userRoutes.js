@@ -10,5 +10,4 @@ routes.patch("/update/password", authToken, userControllers.updateUserPassword.b
 routes.patch("/update/:id/role", authToken, authAdminOnly, userControllers.updateUserRole.bind(userControllers));
 routes.patch("/toggle/:id", authToken, authAdminOnly, userControllers.toggle.bind(userControllers));
 
-
 export default routes;

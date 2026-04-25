@@ -51,10 +51,7 @@ class ProductsService {
     if (categorySlug) where.category = { slug: categorySlug };
 
     if (search) {
-      where.OR = [
-        { name: { contains: search, mode: "insensitive" } },
-        { mark: { contains: search, mode: "insensitive" } },
-      ];
+      where.OR = [{ name: { contains: search, mode: "insensitive" } }, { mark: { contains: search, mode: "insensitive" } }];
     }
 
     return await prisma.product.findMany({
