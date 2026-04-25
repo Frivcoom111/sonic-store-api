@@ -15,12 +15,18 @@ const productSelect = {
 
 class ProductsService {
   async create(data) {
-    const { categoryId, name, mark, description, price, stock, imageUrl } = data;
+    try {
+      const { categoryId, name, mark, description, price, stock, imageUrl } = data;
 
-    return await prisma.product.create({
-      data: { categoryId, name, mark, description, price, stock, imageUrl, slug: generateSlug(name) },
-      select: productSelect,
-    });
+      return await prisma.product.create({
+        data: { categoryId, name, mark, description, price, stock, imageUrl, slug: generateSlug(name) },
+        select: productSelect,
+      });
+    } catch (error) {
+      if (error.code === "P2002") throw new Error("Já existe um produto com esse nome.");
+      if (error.code === "P2003") throw new Error("Categoria não encontrada.");
+      throw error;
+    }
   }
 
   async update(id, data) {
@@ -31,18 +37,31 @@ class ProductsService {
 
     if (updateData.name) updateData.slug = generateSlug(updateData.name);
 
-    return await prisma.product.update({
-      where: { id },
-      data: updateData,
-      select: productSelect,
-    });
+    try {
+      return await prisma.product.update({
+        where: { id },
+        data: updateData,
+        select: productSelect,
+      });
+    } catch (error) {
+      if (error.code === "P2025") throw new Error("Produto não encontrado.");
+      if (error.code === "P2002") throw new Error("Já existe um produto com esse nome.");
+      if (error.code === "P2003") throw new Error("Categoria não encontrada.");
+      throw error;
+    }
   }
 
   async delete(id) {
-    return await prisma.product.delete({
-      where: { id },
-      select: { id: true, name: true, slug: true },
-    });
+    try {
+      return await prisma.product.delete({
+        where: { id },
+        select: { id: true, name: true, slug: true },
+      });
+    } catch (error) {
+      if (error.code === "P2025") throw new Error("Produto não encontrado.");
+      if (error.code === "P2003") throw new Error("Produto possui pedidos ou itens de carrinho vinculados.");
+      throw error;
+    }
   }
 
   async getAll({ categorySlug, search } = {}) {

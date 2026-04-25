@@ -25,13 +25,14 @@ class ProductImagesService {
   }
 
   async getByProduct(productId) {
-    const product = await prisma.product.findUnique({ where: { id: productId } });
+    const product = await prisma.product.findUnique({
+      where: { id: productId },
+      select: { images: { select: { id: true, url: true } } },
+    });
+
     if (!product) throw new Error("Produto não encontrado.");
 
-    return await prisma.productImage.findMany({
-      where: { productId },
-      select: { id: true, url: true },
-    });
+    return product;
   }
 }
 

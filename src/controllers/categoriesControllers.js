@@ -40,7 +40,7 @@ class CategoriesControllers {
 
       res.status(200).json({ message: "Categoria atualizada com sucesso.", updatedCategory });
     } catch (error) {
-      nex(error);
+      next(error);
     }
   }
 
