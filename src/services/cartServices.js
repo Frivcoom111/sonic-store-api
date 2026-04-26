@@ -84,6 +84,7 @@ class CartService {
 
     const product = await prisma.product.findUnique({ where: { id: productId } });
 
+    if (!product) throw new Error("Produto não encontrado.");
     if (product.stock < quantity) throw new Error("Estoque insuficiente.");
     if (quantity <= 0) throw new Error("Quantidade inválida.");
 
