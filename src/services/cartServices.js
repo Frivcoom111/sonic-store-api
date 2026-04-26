@@ -45,9 +45,10 @@ class CartService {
 
   async addItem(userId, productId, quantity) {
     const product = await prisma.product.findUnique({ where: { id: productId } });
-
+    
     if (!product) throw new Error("Produto não encontrado.");
     if (product.stock < quantity) throw new Error("Estoque insuficiente.");
+    if (quantity <= 0) throw new Error("Quantidade inválida.");
 
     const cart = await this.#getOrCreateCart(userId);
 
@@ -55,14 +56,13 @@ class CartService {
       where: { cartId: cart.id, productId },
     });
 
+    
     if (existingItem) {
-      const newQuantity = existingItem.quantity + quantity;
-
-      if (product.stock < newQuantity) throw new Error("Estoque insuficiente.");
+      if (existingItem.quantity == quantity) throw new Error("Quantidade igual a do carrinho.");
 
       await prisma.cartItem.update({
         where: { id: existingItem.id },
-        data: { quantity: newQuantity },
+        data: { quantity: quantity },
       });
     } else {
       await prisma.cartItem.create({
@@ -87,6 +87,7 @@ class CartService {
     const product = await prisma.product.findUnique({ where: { id: productId } });
 
     if (product.stock < quantity) throw new Error("Estoque insuficiente.");
+    if (quantity <= 0) throw new Error("Quantidade inválida.");
 
     await prisma.cartItem.update({
       where: { id: item.id },
