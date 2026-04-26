@@ -1,4 +1,5 @@
 import prisma from "../lib/prisma.js";
+import { Prisma } from "../generated/prisma/client.js";
 
 class CartService {
   async #getOrCreateCart(userId) {
@@ -37,7 +38,10 @@ class CartService {
     if (!cart) return { id: null, items: [], total: "0.00" };
 
     const total = cart.items
-      .reduce((sum, item) => sum + Number(item.product.price) * item.quantity, 0)
+      .reduce(
+        (sum, item) => sum.add(item.product.price.mul(item.quantity)),
+        new Prisma.Decimal(0)
+      )
       .toFixed(2);
 
     return { ...cart, total };
@@ -52,23 +56,17 @@ class CartService {
 
     const cart = await this.#getOrCreateCart(userId);
 
-    const existingItem = await prisma.cartItem.findFirst({
-      where: { cartId: cart.id, productId },
+    const existingItem = await prisma.cartItem.findUnique({
+      where: { cartId_productId: { cartId: cart.id, productId } },
     });
 
-    
-    if (existingItem) {
-      if (existingItem.quantity == quantity) throw new Error("Quantidade igual a do carrinho.");
+    if (existingItem?.quantity === quantity) throw new Error("Quantidade igual a do carrinho.");
 
-      await prisma.cartItem.update({
-        where: { id: existingItem.id },
-        data: { quantity: quantity },
-      });
-    } else {
-      await prisma.cartItem.create({
-        data: { cartId: cart.id, productId, quantity },
-      });
-    }
+    await prisma.cartItem.upsert({
+      where: { cartId_productId: { cartId: cart.id, productId } },
+      update: { quantity },
+      create: { cartId: cart.id, productId, quantity },
+    });
 
     return this.getCart(userId);
   }
@@ -78,8 +76,8 @@ class CartService {
 
     if (!cart) throw new Error("Carrinho não encontrado.");
 
-    const item = await prisma.cartItem.findFirst({
-      where: { cartId: cart.id, productId },
+    const item = await prisma.cartItem.findUnique({
+      where: { cartId_productId: { cartId: cart.id, productId } },
     });
 
     if (!item) throw new Error("Item não encontrado no carrinho.");
@@ -90,7 +88,7 @@ class CartService {
     if (quantity <= 0) throw new Error("Quantidade inválida.");
 
     await prisma.cartItem.update({
-      where: { id: item.id },
+      where: { cartId_productId: { cartId: cart.id, productId } },
       data: { quantity },
     });
 
@@ -102,13 +100,15 @@ class CartService {
 
     if (!cart) throw new Error("Carrinho não encontrado.");
 
-    const item = await prisma.cartItem.findFirst({
-      where: { cartId: cart.id, productId },
+    const item = await prisma.cartItem.findUnique({
+      where: { cartId_productId: { cartId: cart.id, productId } },
     });
 
     if (!item) throw new Error("Item não encontrado no carrinho.");
 
-    await prisma.cartItem.delete({ where: { id: item.id } });
+    await prisma.cartItem.delete({
+      where: { cartId_productId: { cartId: cart.id, productId } },
+    });
 
     return this.getCart(userId);
   }
