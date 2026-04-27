@@ -1,5 +1,6 @@
 import prisma from "../lib/prisma.js";
 import { generateSlug } from "../utils/generateSlug.js";
+import { createError } from "../utils/createError.js";
 
 const productSelect = {
   id: true,
@@ -23,8 +24,8 @@ class ProductsService {
         select: productSelect,
       });
     } catch (error) {
-      if (error.code === "P2002") throw new Error("Já existe um produto com esse nome.");
-      if (error.code === "P2003") throw new Error("Categoria não encontrada.");
+      if (error.code === "P2002") throw createError("Já existe um produto com esse nome.", 409);
+      if (error.code === "P2003") throw createError("Categoria não encontrada.", 404);
       throw error;
     }
   }
@@ -33,7 +34,7 @@ class ProductsService {
     const allowedFields = ["categoryId", "name", "mark", "description", "price", "stock", "imageUrl"];
     const updateData = Object.fromEntries(Object.entries(data).filter(([key]) => allowedFields.includes(key)));
 
-    if (Object.keys(updateData).length === 0) throw new Error("Nenhum campo para atualizar.");
+    if (Object.keys(updateData).length === 0) throw createError("Nenhum campo para atualizar.", 400);
 
     if (updateData.name) updateData.slug = generateSlug(updateData.name);
 
@@ -44,9 +45,9 @@ class ProductsService {
         select: productSelect,
       });
     } catch (error) {
-      if (error.code === "P2025") throw new Error("Produto não encontrado.");
-      if (error.code === "P2002") throw new Error("Já existe um produto com esse nome.");
-      if (error.code === "P2003") throw new Error("Categoria não encontrada.");
+      if (error.code === "P2025") throw createError("Produto não encontrado.", 404);
+      if (error.code === "P2002") throw createError("Já existe um produto com esse nome.", 409);
+      if (error.code === "P2003") throw createError("Categoria não encontrada.", 404);
       throw error;
     }
   }
@@ -58,8 +59,8 @@ class ProductsService {
         select: { id: true, name: true, slug: true },
       });
     } catch (error) {
-      if (error.code === "P2025") throw new Error("Produto não encontrado.");
-      if (error.code === "P2003") throw new Error("Produto possui pedidos ou itens de carrinho vinculados.");
+      if (error.code === "P2025") throw createError("Produto não encontrado.", 404);
+      if (error.code === "P2003") throw createError("Produto possui pedidos ou itens de carrinho vinculados.", 409);
       throw error;
     }
   }
@@ -70,7 +71,10 @@ class ProductsService {
     if (categorySlug) where.category = { slug: categorySlug };
 
     if (search) {
-      where.OR = [{ name: { contains: search, mode: "insensitive" } }, { mark: { contains: search, mode: "insensitive" } }];
+      where.OR = [
+        { name: { contains: search, mode: "insensitive" } },
+        { mark: { contains: search, mode: "insensitive" } },
+      ];
     }
 
     return await prisma.product.findMany({
@@ -89,7 +93,7 @@ class ProductsService {
       },
     });
 
-    if (!product) throw new Error("Produto não encontrado.");
+    if (!product) throw createError("Produto não encontrado.", 404);
 
     return product;
   }

@@ -1,9 +1,10 @@
 import prisma from "../lib/prisma.js";
+import { createError } from "../utils/createError.js";
 
 class ProductImagesService {
   async add(productId, url) {
     const product = await prisma.product.findUnique({ where: { id: productId } });
-    if (!product) throw new Error("Produto não encontrado.");
+    if (!product) throw createError("Produto não encontrado.", 404);
 
     return await prisma.productImage.create({
       data: { productId, url },
@@ -16,7 +17,7 @@ class ProductImagesService {
       where: { id: imageId, productId },
     });
 
-    if (!image) throw new Error("Imagem não encontrada.");
+    if (!image) throw createError("Imagem não encontrada.", 404);
 
     return await prisma.productImage.delete({
       where: { id: imageId },
@@ -30,7 +31,7 @@ class ProductImagesService {
       select: { images: { select: { id: true, url: true } } },
     });
 
-    if (!product) throw new Error("Produto não encontrado.");
+    if (!product) throw createError("Produto não encontrado.", 404);
 
     return product;
   }
