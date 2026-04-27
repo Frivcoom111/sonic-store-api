@@ -10,20 +10,20 @@ export const authToken = (req, res, next) => {
     const headerAuthorization = req.headers.authorization;
 
     if (!headerAuthorization || !headerAuthorization.startsWith("Bearer ")) {
-      return next(createError(401, "Token não fornecido."));
+      return next(createError("Token não fornecido.", 401));
     }
 
     const token = headerAuthorization.split(" ")[1];
 
     const decoded = jwt.verify(token, JWT_SECRET);
 
-    if (!decoded.isActive) return next(createError(401, "Usuário desativado, acesso negado."));
+    if (!decoded.isActive) return next(createError("Usuário desativado, acesso negado.", 401));
 
     req.user = decoded; // { id, role, isActive }
 
     next();
   } catch (error) {
-    next(createError(401, "Token inválido ou expirado."));
+    next(createError("Token inválido ou expirado.", 401));
   }
 };
 
@@ -31,7 +31,7 @@ export const authAdminOnly = (req, res, next) => {
   const role = req.user?.role;
 
   if (!role || role !== "ADMIN") {
-    return next(createError(403, "Acesso admin negado."));
+    return next(createError("Acesso admin negado.", 403));
   }
 
   next();
