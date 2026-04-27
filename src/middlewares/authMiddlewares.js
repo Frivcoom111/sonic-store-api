@@ -1,14 +1,9 @@
 import "dotenv/config";
 import jwt from "jsonwebtoken";
 import { getRequiredEnv } from "../utils/getRequeridEnv.js";
+import { createError } from "../utils/createError.js";
 
 const JWT_SECRET = getRequiredEnv("JWT_SECRET");
-
-const createError = (status, message) => {
-  const err = new Error(message);
-  err.status = status;
-  return err;
-};
 
 export const authToken = (req, res, next) => {
   try {
