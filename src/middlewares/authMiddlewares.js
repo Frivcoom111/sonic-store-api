@@ -18,9 +18,9 @@ export const authToken = async (req, res, next) => {
 
     const decoded = jwt.verify(token, JWT_SECRET);
 
-    const isActive = await prisma.user.findUnique({ where: { id: decoded.id }, select: { isActive: true } });
+    const user = await prisma.user.findUnique({ where: { id: decoded.id }, select: { isActive: true } });
 
-    if (!isActive) return next(createError("Usuário desativado, acesso negado.", 401));
+    if (!user || !user.isActive) return next(createError("Usuário desativado, acesso negado.", 401));
 
     req.user = decoded; // { id, role, isActive }
 

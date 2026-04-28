@@ -21,11 +21,7 @@ class AddressControllers {
         return res.status(400).json({ error: validation.error.format() });
       }
 
-      const address = await addressServices.getAddressById(
-        validation.data.id,
-        req.user.id,
-        req.user.role
-      );
+      const address = await addressServices.getAddressById(validation.data.id, req.user.id, req.user.role);
 
       res.status(200).json({ address });
     } catch (error) {
@@ -62,11 +58,11 @@ class AddressControllers {
         return res.status(400).json({ error: validation.error.format() });
       }
 
-      const address = await addressServices.updateAddress(
-        validationId.data.id,
-        req.user.id,
-        validation.data
-      );
+      if (Object.keys(validation.data).length === 0) {
+        return res.status(400).json({ error: "Nenhum campo para atualizar." });
+      }
+
+      const address = await addressServices.updateAddress(validationId.data.id, req.user.id, validation.data);
 
       res.status(200).json({ message: "Endereço atualizado com sucesso.", address });
     } catch (error) {
