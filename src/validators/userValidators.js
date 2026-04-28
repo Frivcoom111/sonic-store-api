@@ -27,7 +27,7 @@ export const userUpdatePasswordSchema = z
   .object({
     currentPassword: z.string().min(1, "Senha atual obrigatória."),
     newPassword: passwordSchema,
-  })
+  });
 
 export const userUpdateRoleSchema = z
   .object({
