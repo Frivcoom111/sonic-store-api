@@ -10,7 +10,6 @@ import {
 class UserController {
   async createUser(req, res, next) {
     try {
-      // Validação com o zod.
       const validation = userCreateSchema.safeParse(req.body);
 
       if (!validation.success) {
@@ -19,14 +18,22 @@ class UserController {
 
       const { name, email, password, role } = validation.data;
 
-      const userCreated = await userService.create({
-        name,
-        email,
-        password,
-        role,
-      });
+      const userCreated = await userService.create({ name, email, password, role });
 
       res.status(201).json({ message: "Usuário criado com sucesso.", userCreated });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async getUsers(req, res, next) {
+    try {
+      const page = parseInt(req.query.page) || 1;
+      const limit = parseInt(req.query.limit) || 20;
+
+      const result = await userService.getAll({ page, limit });
+
+      res.status(200).json(result);
     } catch (error) {
       next(error);
     }
@@ -103,7 +110,7 @@ class UserController {
       const { isActive } = req.body;
 
       if (typeof isActive !== "boolean") {
-        return res.status(400).json({ message: "isActive deve ser um boolean." });
+        return res.status(400).json({ error: "isActive deve ser um boolean." });
       }
 
       const userToggle = await userService.toggle({ id: validation.data.id, isActive });

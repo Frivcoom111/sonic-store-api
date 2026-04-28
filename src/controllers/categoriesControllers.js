@@ -1,11 +1,11 @@
 import categoriesServices from "../services/categoriesServices.js";
-import { categorySchema } from "../validators/categoriesValidators.js";
+import { categoryCreateSchema, categoryUpdateSchema } from "../validators/categoriesValidators.js";
 import { idParamsSchema } from "../validators/globalValidators.js";
 
 class CategoriesControllers {
   async createCategory(req, res, next) {
     try {
-      const validation = categorySchema.safeParse(req.body);
+      const validation = categoryCreateSchema.safeParse(req.body);
 
       if (!validation.success) {
         return res.status(400).json({ error: validation.error.format() });
@@ -26,14 +26,15 @@ class CategoriesControllers {
       const { id } = req.params;
 
       const validationId = idParamsSchema.safeParse({ id });
-      const validation = categorySchema.safeParse(req.body);
-
-      if (!validation.success) {
-        return res.status(400).json({ error: validation.error.format() })
-      }
 
       if (!validationId.success) {
-        return res.status(400).json({ error: validationId.error.format() })
+        return res.status(400).json({ error: validationId.error.format() });
+      }
+
+      const validation = categoryUpdateSchema.safeParse(req.body);
+
+      if (!validation.success) {
+        return res.status(400).json({ error: validation.error.format() });
       }
 
       const updatedCategory = await categoriesServices.update(validationId.data.id, validation.data);
@@ -51,7 +52,7 @@ class CategoriesControllers {
       const validation = idParamsSchema.safeParse({ id });
 
       if (!validation.success) {
-        return res.status(400).json({ error: validation.error.format() })
+        return res.status(400).json({ error: validation.error.format() });
       }
 
       const deletedCategory = await categoriesServices.delete(validation.data.id);

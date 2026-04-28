@@ -58,10 +58,6 @@ class AddressControllers {
         return res.status(400).json({ error: validation.error.format() });
       }
 
-      if (Object.keys(validation.data).length === 0) {
-        return res.status(400).json({ error: "Nenhum campo para atualizar." });
-      }
-
       const address = await addressServices.updateAddress(validationId.data.id, req.user.id, validation.data);
 
       res.status(200).json({ message: "Endereço atualizado com sucesso.", address });

@@ -10,4 +10,6 @@ export const productSchema = z.object({
   imageUrl: z.string().url("URL de imagem inválida."),
 });
 
-export const updateProductSchema = productSchema.partial();
+export const updateProductSchema = productSchema
+  .partial()
+  .refine((data) => Object.keys(data).length > 0, { message: "Nenhum campo para atualizar." });

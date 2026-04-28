@@ -25,13 +25,7 @@ class CategoriesService {
     }
   }
 
-  async update(id, body) {
-    const allowedFields = ["name"];
-
-    const data = Object.fromEntries(Object.entries(body).filter(([key]) => allowedFields.includes(key)));
-
-    if (Object.keys(data).length === 0) throw createError("Nenhum campo para atualizar.", 400);
-
+  async update(id, data) {
     if (data.name) data.slug = generateSlug(data.name);
 
     try {
