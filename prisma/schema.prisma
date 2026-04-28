@@ -47,7 +47,8 @@ model Address {
   number     Int      @db.Integer
   complement String?  @db.VarChar(100)
   city       String   @db.VarChar(100)
-  state      String   @db.VarChar(100)
+  state      String   @db.VarChar(2)
+  zipCode    String   @db.VarChar(9)
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
 

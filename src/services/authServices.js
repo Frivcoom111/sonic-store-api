@@ -83,6 +83,7 @@ class AuthService {
             street: true,
             complement: true,
             number: true,
+            zipCode: true
           },
         },
       },

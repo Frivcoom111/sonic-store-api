@@ -108,7 +108,7 @@ class UserController {
 
       const userToggle = await userService.toggle({ id: validation.data.id, isActive });
 
-      res.status(200).json({ message: "Usuário ativado com sucesso.", userToggle });
+      res.status(200).json({ message: `Usuário ${userToggle.isActive ? "ativado" : "desativado"} com sucesso.`, userToggle });
     } catch (error) {
       next(error);
     }
