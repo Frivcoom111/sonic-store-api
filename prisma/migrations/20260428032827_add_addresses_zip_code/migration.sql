@@ -7,8 +7,10 @@
 
 */
 -- AlterTable
-ALTER TABLE "Address" ADD COLUMN     "zipCode" VARCHAR(9) NOT NULL,
+ALTER TABLE "Address" ADD COLUMN     "zipCode" VARCHAR(9) NOT NULL DEFAULT '',
 ALTER COLUMN "state" SET DATA TYPE VARCHAR(2);
 
+-- Remove temporary default after backfilling existing rows during column creation
+ALTER TABLE "Address" ALTER COLUMN "zipCode" DROP DEFAULT;
 -- CreateIndex
 CREATE UNIQUE INDEX "CartItem_cartId_productId_key" ON "CartItem"("cartId", "productId");
