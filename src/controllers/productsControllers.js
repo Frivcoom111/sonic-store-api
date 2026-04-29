@@ -64,8 +64,10 @@ class ProductsControllers {
   async getProducts(req, res, next) {
     try {
       const { category, search } = req.query;
-      const page = parseInt(req.query.page) || 1;
-      const limit = parseInt(req.query.limit) || 20;
+      const parsedPage = Number.parseInt(req.query.page, 10);
+      const parsedLimit = Number.parseInt(req.query.limit, 10);
+      const page = Number.isInteger(parsedPage) && parsedPage > 0 ? parsedPage : 1;
+      const limit = Number.isInteger(parsedLimit) && parsedLimit > 0 ? parsedLimit : 20;
 
       const result = await productsServices.getAll({ categorySlug: category, search, page, limit });
 
