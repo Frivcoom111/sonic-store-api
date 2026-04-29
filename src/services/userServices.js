@@ -31,8 +31,9 @@ class UserService {
   }
 
   async getAll({ page = 1, limit = 20 } = {}) {
-    const take = Math.min(limit, 100);
-    const skip = (page - 1) * take;
+    const safePage = Math.max(1, Math.trunc(page));
+    const take = Math.min(Math.max(1, Math.trunc(limit)), 100);
+    const skip = (safePage - 1) * take;
 
     const [data, total] = await Promise.all([
       prisma.user.findMany({
@@ -50,7 +51,7 @@ class UserService {
       prisma.user.count(),
     ]);
 
-    return { data, meta: { total, page, limit: take, totalPages: Math.ceil(total / take) } };
+    return { data, meta: { total, page: safePage, limit: take, totalPages: Math.ceil(total / take) } };
   }
 
   async update(id, data) {

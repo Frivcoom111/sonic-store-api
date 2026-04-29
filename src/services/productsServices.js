@@ -61,8 +61,9 @@ class ProductsService {
   }
 
   async getAll({ categorySlug, search, page = 1, limit = 20 } = {}) {
-    const take = Math.min(limit, 100);
-    const skip = (page - 1) * take;
+    const safePage = Math.max(1, Math.trunc(page));
+    const take = Math.min(Math.max(1, Math.trunc(limit)), 100);
+    const skip = (safePage - 1) * take;
     const where = {};
 
     if (categorySlug) where.category = { slug: categorySlug };
@@ -85,7 +86,7 @@ class ProductsService {
       prisma.product.count({ where }),
     ]);
 
-    return { data, meta: { total, page, limit: take, totalPages: Math.ceil(total / take) } };
+    return { data, meta: { total, page: safePage, limit: take, totalPages: Math.ceil(total / take) } };
   }
 
   async getById(id) {
