@@ -30,14 +30,32 @@ class UserService {
     }
   }
 
-  async update(id, body) {
-    const allowedFields = ["name", "email"];
+  async getAll({ page = 1, limit = 20 } = {}) {
+    const safePage = Math.max(1, Math.trunc(page));
+    const take = Math.min(Math.max(1, Math.trunc(limit)), 100);
+    const skip = (safePage - 1) * take;
 
-    const data = Object.fromEntries(Object.entries(body).filter(([key]) => allowedFields.includes(key)));
+    const [data, total] = await Promise.all([
+      prisma.user.findMany({
+        skip,
+        take,
+        select: {
+          id: true,
+          name: true,
+          email: true,
+          role: true,
+          isActive: true,
+        },
+        orderBy: { name: "asc" },
+      }),
+      prisma.user.count(),
+    ]);
 
+    return { data, meta: { total, page: safePage, limit: take, totalPages: Math.ceil(total / take) } };
+  }
+
+  async update(id, data) {
     if (data.email) data.email = data.email.toLowerCase().trim();
-
-    if (Object.keys(data).length === 0) throw createError("Nenhum campo para atualizar.", 400);
 
     try {
       const updatedUser = await prisma.user.update({

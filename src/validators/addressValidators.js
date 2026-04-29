@@ -12,4 +12,8 @@ export const createAddressSchema = z.object({
   zipCode: z.string().regex(CEP_REGEX, "CEP inválido. Use o formato XXXXX-XXX."),
 });
 
-export const updateAddressSchema = createAddressSchema.partial();
+export const updateAddressSchema = createAddressSchema
+  .partial()
+  .refine((data) => Object.keys(data).length > 0, {
+    message: "Nenhum campo para atualizar.",
+  });

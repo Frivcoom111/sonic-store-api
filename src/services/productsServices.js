@@ -31,17 +31,12 @@ class ProductsService {
   }
 
   async update(id, data) {
-    const allowedFields = ["categoryId", "name", "mark", "description", "price", "stock", "imageUrl"];
-    const updateData = Object.fromEntries(Object.entries(data).filter(([key]) => allowedFields.includes(key)));
-
-    if (Object.keys(updateData).length === 0) throw createError("Nenhum campo para atualizar.", 400);
-
-    if (updateData.name) updateData.slug = generateSlug(updateData.name);
+    if (data.name) data.slug = generateSlug(data.name);
 
     try {
       return await prisma.product.update({
         where: { id },
-        data: updateData,
+        data,
         select: productSelect,
       });
     } catch (error) {
@@ -65,7 +60,10 @@ class ProductsService {
     }
   }
 
-  async getAll({ categorySlug, search } = {}) {
+  async getAll({ categorySlug, search, page = 1, limit = 20 } = {}) {
+    const safePage = Math.max(1, Math.trunc(page));
+    const take = Math.min(Math.max(1, Math.trunc(limit)), 100);
+    const skip = (safePage - 1) * take;
     const where = {};
 
     if (categorySlug) where.category = { slug: categorySlug };
@@ -77,11 +75,18 @@ class ProductsService {
       ];
     }
 
-    return await prisma.product.findMany({
-      where,
-      select: productSelect,
-      orderBy: { name: "asc" },
-    });
+    const [data, total] = await Promise.all([
+      prisma.product.findMany({
+        where,
+        skip,
+        take,
+        select: productSelect,
+        orderBy: { name: "asc" },
+      }),
+      prisma.product.count({ where }),
+    ]);
+
+    return { data, meta: { total, page: safePage, limit: take, totalPages: Math.ceil(total / take) } };
   }
 
   async getById(id) {

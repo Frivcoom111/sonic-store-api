@@ -10,7 +10,6 @@ import {
 class UserController {
   async createUser(req, res, next) {
     try {
-      // Validação com o zod.
       const validation = userCreateSchema.safeParse(req.body);
 
       if (!validation.success) {
@@ -19,14 +18,36 @@ class UserController {
 
       const { name, email, password, role } = validation.data;
 
-      const userCreated = await userService.create({
-        name,
-        email,
-        password,
-        role,
-      });
+      const userCreated = await userService.create({ name, email, password, role });
 
       res.status(201).json({ message: "Usuário criado com sucesso.", userCreated });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async getUsers(req, res, next) {
+    try {
+      const rawPage = req.query.page;
+      const rawLimit = req.query.limit;
+
+      const page = rawPage === undefined ? 1 : Number.parseInt(rawPage, 10);
+      const limit = rawLimit === undefined ? 20 : Number.parseInt(rawLimit, 10);
+
+      if (
+        !Number.isInteger(page) ||
+        !Number.isInteger(limit) ||
+        page < 1 ||
+        limit < 1 ||
+        limit > 100
+      ) {
+        return res.status(400).json({
+          error: "Parâmetros de paginação inválidos. 'page' deve ser >= 1 e 'limit' deve estar entre 1 e 100.",
+        });
+      }
+      const result = await userService.getAll({ page, limit });
+
+      res.status(200).json(result);
     } catch (error) {
       next(error);
     }
@@ -103,7 +124,7 @@ class UserController {
       const { isActive } = req.body;
 
       if (typeof isActive !== "boolean") {
-        return res.status(400).json({ message: "isActive deve ser um boolean." });
+        return res.status(400).json({ error: "isActive deve ser um boolean." });
       }
 
       const userToggle = await userService.toggle({ id: validation.data.id, isActive });
