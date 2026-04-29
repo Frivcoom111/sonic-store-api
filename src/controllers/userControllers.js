@@ -28,9 +28,23 @@ class UserController {
 
   async getUsers(req, res, next) {
     try {
-      const page = parseInt(req.query.page) || 1;
-      const limit = parseInt(req.query.limit) || 20;
+      const rawPage = req.query.page;
+      const rawLimit = req.query.limit;
 
+      const page = rawPage === undefined ? 1 : Number.parseInt(rawPage, 10);
+      const limit = rawLimit === undefined ? 20 : Number.parseInt(rawLimit, 10);
+
+      if (
+        !Number.isInteger(page) ||
+        !Number.isInteger(limit) ||
+        page < 1 ||
+        limit < 1 ||
+        limit > 100
+      ) {
+        return res.status(400).json({
+          error: "Parâmetros de paginação inválidos. 'page' deve ser >= 1 e 'limit' deve estar entre 1 e 100.",
+        });
+      }
       const result = await userService.getAll({ page, limit });
 
       res.status(200).json(result);
