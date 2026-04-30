@@ -1,5 +1,6 @@
 import prisma from "../lib/prisma.js";
 import { generateSlug } from "../utils/generateSlug.js";
+import { createError } from "../utils/createError.js";
 
 const productSelect = {
   id: true,
@@ -15,37 +16,54 @@ const productSelect = {
 
 class ProductsService {
   async create(data) {
-    const { categoryId, name, mark, description, price, stock, imageUrl } = data;
+    try {
+      const { categoryId, name, mark, description, price, stock, imageUrl } = data;
 
-    return await prisma.product.create({
-      data: { categoryId, name, mark, description, price, stock, imageUrl, slug: generateSlug(name) },
-      select: productSelect,
-    });
+      return await prisma.product.create({
+        data: { categoryId, name, mark, description, price, stock, imageUrl, slug: generateSlug(name) },
+        select: productSelect,
+      });
+    } catch (error) {
+      if (error.code === "P2002") throw createError("Já existe um produto com esse nome.", 409);
+      if (error.code === "P2003") throw createError("Categoria não encontrada.", 404);
+      throw error;
+    }
   }
 
   async update(id, data) {
-    const allowedFields = ["categoryId", "name", "mark", "description", "price", "stock", "imageUrl"];
-    const updateData = Object.fromEntries(Object.entries(data).filter(([key]) => allowedFields.includes(key)));
+    if (data.name) data.slug = generateSlug(data.name);
 
-    if (Object.keys(updateData).length === 0) throw new Error("Nenhum campo para atualizar.");
-
-    if (updateData.name) updateData.slug = generateSlug(updateData.name);
-
-    return await prisma.product.update({
-      where: { id },
-      data: updateData,
-      select: productSelect,
-    });
+    try {
+      return await prisma.product.update({
+        where: { id },
+        data,
+        select: productSelect,
+      });
+    } catch (error) {
+      if (error.code === "P2025") throw createError("Produto não encontrado.", 404);
+      if (error.code === "P2002") throw createError("Já existe um produto com esse nome.", 409);
+      if (error.code === "P2003") throw createError("Categoria não encontrada.", 404);
+      throw error;
+    }
   }
 
   async delete(id) {
-    return await prisma.product.delete({
-      where: { id },
-      select: { id: true, name: true, slug: true },
-    });
+    try {
+      return await prisma.product.delete({
+        where: { id },
+        select: { id: true, name: true, slug: true },
+      });
+    } catch (error) {
+      if (error.code === "P2025") throw createError("Produto não encontrado.", 404);
+      if (error.code === "P2003") throw createError("Produto possui pedidos ou itens de carrinho vinculados.", 409);
+      throw error;
+    }
   }
 
-  async getAll({ categorySlug, search } = {}) {
+  async getAll({ categorySlug, search, page = 1, limit = 20 } = {}) {
+    const safePage = Math.max(1, Math.trunc(page));
+    const take = Math.min(Math.max(1, Math.trunc(limit)), 100);
+    const skip = (safePage - 1) * take;
     const where = {};
 
     if (categorySlug) where.category = { slug: categorySlug };
@@ -57,11 +75,18 @@ class ProductsService {
       ];
     }
 
-    return await prisma.product.findMany({
-      where,
-      select: productSelect,
-      orderBy: { name: "asc" },
-    });
+    const [data, total] = await Promise.all([
+      prisma.product.findMany({
+        where,
+        skip,
+        take,
+        select: productSelect,
+        orderBy: { name: "asc" },
+      }),
+      prisma.product.count({ where }),
+    ]);
+
+    return { data, meta: { total, page: safePage, limit: take, totalPages: Math.ceil(total / take) } };
   }
 
   async getById(id) {
@@ -73,7 +98,7 @@ class ProductsService {
       },
     });
 
-    if (!product) throw new Error("Produto não encontrado.");
+    if (!product) throw createError("Produto não encontrado.", 404);
 
     return product;
   }

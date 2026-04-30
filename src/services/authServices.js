@@ -2,13 +2,12 @@ import prisma from "../lib/prisma.js";
 import { compareHashPassword } from "../utils/compareHashPassword.js";
 import { generateHashPassword } from "../utils/generateHashPassword.js";
 import { generateToken } from "../utils/generateToken.js";
+import { createError } from "../utils/createError.js";
+
 class AuthService {
   async register({ name, email, password }) {
     try {
-      // Normalizando o email
       const normalizedEmail = email.toLowerCase().trim();
-
-      // Gera hash da senha.
       const hashPassword = await generateHashPassword(password);
 
       const user = await prisma.user.create({
@@ -27,23 +26,16 @@ class AuthService {
 
       return user;
     } catch (error) {
-      if (error.code === "P2002") {
-        // código Prisma pra unique constraint
-        throw new Error("Email já cadastrado.");
-      }
-
+      if (error.code === "P2002") throw createError("Email já cadastrado.", 409);
       throw error;
     }
   }
 
   async login({ email, password }) {
-    // Normalizando o email
     const normalizedEmail = email.toLowerCase().trim();
 
     const user = await prisma.user.findUnique({
-      where: {
-        email: normalizedEmail,
-      },
+      where: { email: normalizedEmail },
       select: {
         id: true,
         name: true,
@@ -54,15 +46,11 @@ class AuthService {
       },
     });
 
-    // Validação se o usuário existe.
-    if (!user) throw new Error("Email ou senha inválidos.");
+    if (!user) throw createError("Email ou senha inválidos.", 401);
+    if (!user.isActive) throw createError("Usuário inativo.", 403);
 
-    // Validação se o usuário está ativo.
-    if (!user.isActive) throw new Error("Usuário inativo.");
-
-    // Validação senha.
     const isMatch = await compareHashPassword(password, user.password);
-    if (!isMatch) throw new Error("Email ou senha inválidos.");
+    if (!isMatch) throw createError("Email ou senha inválidos.", 401);
 
     const token = generateToken(user);
 
@@ -79,10 +67,8 @@ class AuthService {
   }
 
   async getUser(id) {
-    // Validação dos dados.
-    if (!id) throw new Error("ID inválido.");
+    if (!id) throw createError("ID inválido.", 400);
 
-    // Buscando usuário e endereço do usuário.
     const user = await prisma.user.findUnique({
       where: { id: id },
       select: {
@@ -97,16 +83,14 @@ class AuthService {
             street: true,
             complement: true,
             number: true,
+            zipCode: true
           },
         },
       },
     });
 
-    // Validação se o usuário existe.
-    if (!user) throw new Error("Erro ao buscar usuário.");
-
-    // Validação se o usuário está ativo.
-    if (!user.isActive) throw new Error("Usuário inativo.");
+    if (!user) throw createError("Usuário não encontrado.", 404);
+    if (!user.isActive) throw createError("Usuário inativo.", 403);
 
     return user;
   }

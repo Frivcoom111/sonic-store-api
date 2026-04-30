@@ -64,10 +64,14 @@ class ProductsControllers {
   async getProducts(req, res, next) {
     try {
       const { category, search } = req.query;
+      const parsedPage = Number.parseInt(req.query.page, 10);
+      const parsedLimit = Number.parseInt(req.query.limit, 10);
+      const page = Number.isInteger(parsedPage) && parsedPage > 0 ? parsedPage : 1;
+      const limit = Number.isInteger(parsedLimit) && parsedLimit > 0 ? parsedLimit : 20;
 
-      const products = await productsServices.getAll({ categorySlug: category, search });
+      const result = await productsServices.getAll({ categorySlug: category, search, page, limit });
 
-      res.status(200).json({ products });
+      res.status(200).json(result);
     } catch (error) {
       next(error);
     }

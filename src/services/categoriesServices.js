@@ -1,5 +1,6 @@
 import prisma from "../lib/prisma.js";
 import { generateSlug } from "../utils/generateSlug.js";
+import { createError } from "../utils/createError.js";
 
 class CategoriesService {
   async create(name) {
@@ -19,64 +20,62 @@ class CategoriesService {
 
       return createdCategory;
     } catch (error) {
-      if (error.code === "P2002") {
-        throw new Error("Categoria já existe.");
-      }
+      if (error.code === "P2002") throw createError("Categoria já existe.", 409);
       throw error;
     }
   }
 
-  async update(id, body) {
-    const allowedFields = ["name"];
-
-    const data = Object.fromEntries(Object.entries(body).filter(([key]) => allowedFields.includes(key)));
-
-    if (Object.keys(data).length === 0) throw new Error("Nenhum campo para atualizar.");
-
+  async update(id, data) {
     if (data.name) data.slug = generateSlug(data.name);
 
-    const updatedCategory = await prisma.category.update({
-      where: {
-        id: id,
-      },
-      data,
-      select: {
-        name: true,
-        slug: true
-      }
-    })
+    try {
+      const updatedCategory = await prisma.category.update({
+        where: { id: id },
+        data,
+        select: {
+          name: true,
+          slug: true,
+        },
+      });
 
-    return updatedCategory;
+      return updatedCategory;
+    } catch (error) {
+      if (error.code === "P2025") throw createError("Categoria não encontrada.", 404);
+      if (error.code === "P2002") throw createError("Categoria já existe.", 409);
+      throw error;
+    }
   }
 
   async delete(id) {
-    const deletedCategory = await prisma.category.delete({
-      where: {
-        id: id
-      },
-      select: {
-        name: true,
-        slug: true,
-      }
-    });
+    try {
+      const deletedCategory = await prisma.category.delete({
+        where: { id: id },
+        select: {
+          name: true,
+          slug: true,
+        },
+      });
 
-    return deletedCategory;
+      return deletedCategory;
+    } catch (error) {
+      if (error.code === "P2025") throw createError("Categoria não encontrada.", 404);
+      if (error.code === "P2003") throw createError("Categoria possui produtos vinculados.", 409);
+      throw error;
+    }
   }
 
   async get({ slug } = {}) {
     if (slug) {
       const category = await prisma.category.findUnique({
-        where: {
-          slug: slug,
-        },
+        where: { slug: slug },
         select: {
           id: true,
           name: true,
           slug: true,
-        }
+        },
       });
 
-      if (!category) throw new Error("Categoria não encontrada.");
+      if (!category) throw createError("Categoria não encontrada.", 404);
 
       return category;
     }

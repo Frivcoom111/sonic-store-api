@@ -4,21 +4,15 @@ import { loginSchema, registerSchema } from "../validators/authValidators.js";
 class AuthController {
   async register(req, res, next) {
     try {
-      // Validação dos dados no Zod.
       const validation = registerSchema.safeParse(req.body);
 
-      // Lançamento dos erros do zod.
       if (!validation.success) {
         return res.status(400).json({ error: validation.error.format() });
       }
 
       const { name, email, password } = validation.data;
 
-      const userCreated = await authService.register({
-        name,
-        email,
-        password,
-      });
+      const userCreated = await authService.register({ name, email, password });
 
       res.status(201).json({ message: "Usuário criado com sucesso.", userCreated });
     } catch (error) {
@@ -28,26 +22,17 @@ class AuthController {
 
   async login(req, res, next) {
     try {
-      // Validação dos dados no Zod.
       const validation = loginSchema.safeParse(req.body);
 
-      // Lançamento dos erros do zod.
       if (!validation.success) {
         return res.status(400).json({ error: validation.error.format() });
       }
 
       const { email, password } = validation.data;
 
-      const user = await authService.login({
-        email,
-        password,
-      });
+      const { token, user } = await authService.login({ email, password });
 
-      res.status(200).json({
-        message: "Login feito com sucesso.",
-        token: user.token,
-        user: user.user,
-      });
+      res.status(200).json({ message: "Login feito com sucesso.", token, user });
     } catch (error) {
       next(error);
     }

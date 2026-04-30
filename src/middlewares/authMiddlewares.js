@@ -1,43 +1,41 @@
 import "dotenv/config";
 import jwt from "jsonwebtoken";
 import { getRequiredEnv } from "../utils/getRequeridEnv.js";
+import { createError } from "../utils/createError.js";
+import prisma from "../lib/prisma.js";
 
 const JWT_SECRET = getRequiredEnv("JWT_SECRET");
 
-export const authToken = (req, res, next) => {
+export const authToken = async (req, res, next) => {
   try {
     const headerAuthorization = req.headers.authorization;
 
-    // Verificação do token JWT.
     if (!headerAuthorization || !headerAuthorization.startsWith("Bearer ")) {
-      return res.status(401).json({ message: "Token não fornecido" });
+      return next(createError("Token não fornecido.", 401));
     }
 
     const token = headerAuthorization.split(" ")[1];
 
     const decoded = jwt.verify(token, JWT_SECRET);
 
-    // Verifica se o usuário está desativado.
-    if (!decoded.isActive) return res.status(401).json({ message: "Usuário desativado, acesso negado." });
+    const user = await prisma.user.findUnique({ where: { id: decoded.id }, select: { isActive: true } });
+
+    if (!user || !user.isActive) return next(createError("Usuário desativado, acesso negado.", 401));
 
     req.user = decoded; // { id, role, isActive }
 
     next();
   } catch (error) {
-    res.status(401).json({ message: "Token inválido ou expirado" });
+    next(createError("Token inválido ou expirado.", 401));
   }
 };
 
 export const authAdminOnly = (req, res, next) => {
-  try {
-    const role = req.user.role;
+  const role = req.user?.role;
 
-    if (!role || role !== "ADMIN") {
-      return res.status(403).json({ message: "Acesso admin negado." });
-    }
-
-    next();
-  } catch (error) {
-    res.status(403).json({ message: "Acesso admin negado." });
+  if (!role || role !== "ADMIN") {
+    return next(createError("Acesso admin negado.", 403));
   }
+
+  next();
 };

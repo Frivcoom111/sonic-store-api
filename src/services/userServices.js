@@ -1,13 +1,12 @@
 import prisma from "../lib/prisma.js";
 import { generateHashPassword } from "../utils/generateHashPassword.js";
 import { compareHashPassword } from "../utils/compareHashPassword.js";
+import { createError } from "../utils/createError.js";
 
 class UserService {
   async create({ name, email, password, role }) {
     try {
-      // Normalizando email
       const normalizedEmail = email.toLowerCase().trim();
-
       const hashPassword = await generateHashPassword(password);
 
       const user = await prisma.user.create({
@@ -26,61 +25,73 @@ class UserService {
 
       return user;
     } catch (error) {
-      if (error.code === "P2002") {
-        // Código Prisma pra unique constraint
-        throw new Error("Email já cadastrado.");
-      }
-
+      if (error.code === "P2002") throw createError("Email já cadastrado.", 409);
       throw error;
     }
   }
 
-  async update(id, body) {
-    const allowedFields = ["name", "email"];
+  async getAll({ page = 1, limit = 20 } = {}) {
+    const safePage = Math.max(1, Math.trunc(page));
+    const take = Math.min(Math.max(1, Math.trunc(limit)), 100);
+    const skip = (safePage - 1) * take;
 
-    const data = Object.fromEntries(Object.entries(body).filter(([key]) => allowedFields.includes(key)));
+    const [data, total] = await Promise.all([
+      prisma.user.findMany({
+        skip,
+        take,
+        select: {
+          id: true,
+          name: true,
+          email: true,
+          role: true,
+          isActive: true,
+        },
+        orderBy: { name: "asc" },
+      }),
+      prisma.user.count(),
+    ]);
 
+    return { data, meta: { total, page: safePage, limit: take, totalPages: Math.ceil(total / take) } };
+  }
+
+  async update(id, data) {
     if (data.email) data.email = data.email.toLowerCase().trim();
 
-    if (Object.keys(data).length === 0) throw new Error("Nenhum campo para atualizar.");
+    try {
+      const updatedUser = await prisma.user.update({
+        where: { id: id },
+        data,
+        select: {
+          name: true,
+          email: true,
+          role: true,
+        },
+      });
 
-    const updatedUser = await prisma.user.update({
-      where: {
-        id: id,
-      },
-      data,
-      select: {
-        name: true,
-        email: true,
-        role: true,
-      },
-    });
-
-    return updatedUser;
+      return updatedUser;
+    } catch (error) {
+      if (error.code === "P2025") throw createError("Usuário não encontrado.", 404);
+      if (error.code === "P2002") throw createError("Email já cadastrado.", 409);
+      throw error;
+    }
   }
 
   async updatePassword({ id, currentPassword, newPassword }) {
     const userPassword = await prisma.user.findUnique({
-      where: {
-        id: id,
-      },
-      select: {
-        password: true,
-      },
+      where: { id: id },
+      select: { password: true },
     });
 
+    if (!userPassword) throw createError("Usuário não encontrado.", 404);
+
     const isMatch = await compareHashPassword(currentPassword, userPassword.password);
-    if (!isMatch) throw new Error("Senha inválida.");
+    if (!isMatch) throw createError("Senha inválida.", 401);
 
     const hashPassword = await generateHashPassword(newPassword);
 
     const updatedUser = await prisma.user.update({
-      where: {
-        id: id,
-      },
-      data: {
-        password: hashPassword,
-      },
+      where: { id: id },
+      data: { password: hashPassword },
       select: {
         name: true,
         email: true,
@@ -92,25 +103,17 @@ class UserService {
   }
 
   async updateRole({ id, role }) {
-    const userRole = await prisma.user.findUnique({
-      where: {
-        id: id,
-      },
-      select: {
-        role: true,
-      },
+    const user = await prisma.user.findUnique({
+      where: { id: id },
+      select: { role: true },
     });
 
-    // Validando role do usuário que veio do banco.
-    if (userRole.role === role) throw new Error(`Usuário já é um ${role}`);
+    if (!user) throw createError("Usuário não encontrado.", 404);
+    if (user.role === role) throw createError(`Usuário já é um ${role}.`, 409);
 
     const updatedUser = await prisma.user.update({
-      where: {
-        id: id,
-      },
-      data: {
-        role: role,
-      },
+      where: { id: id },
+      data: { role: role },
       select: {
         name: true,
         email: true,
@@ -123,9 +126,7 @@ class UserService {
 
   async toggle({ id, isActive }) {
     const user = await prisma.user.findUnique({
-      where: {
-        id: id,
-      },
+      where: { id: id },
       select: {
         name: true,
         email: true,
@@ -134,16 +135,12 @@ class UserService {
       },
     });
 
-    if (!user) throw new Error("Usuário não existe.");
-    if (user.isActive === isActive) throw new Error(`Usuário já está ${isActive ? "ativado." : "desativado."}`);
+    if (!user) throw createError("Usuário não encontrado.", 404);
+    if (user.isActive === isActive) throw createError(`Usuário já está ${isActive ? "ativado." : "desativado."}`, 409);
 
     const userToggle = await prisma.user.update({
-      where: {
-        id: id,
-      },
-      data: {
-        isActive: isActive,
-      },
+      where: { id: id },
+      data: { isActive: isActive },
       select: {
         name: true,
         email: true,
