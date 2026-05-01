@@ -1,4 +1,7 @@
 import express from "express";
+import swaggerJsdoc from "swagger-jsdoc";
+import swaggerUi from "swagger-ui-express";
+import { swaggerOptions } from "./config/swagger.js";
 import authRoutes from "./routes/authRoutes.js";
 import userRoutes from "./routes/userRoutes.js";
 import categoriesRoutes from "./routes/categoriesRoutes.js";
@@ -10,6 +13,9 @@ import { errorMiddlware } from "./middlewares/errorMiddlewares.js";
 
 const app = express();
 app.use(express.json({ limit: "10kb" }));
+
+const swaggerSpec = swaggerJsdoc(swaggerOptions);
+app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 app.use("/auth", authRoutes);
 app.use("/users", userRoutes);
