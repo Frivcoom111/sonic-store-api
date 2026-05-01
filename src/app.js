@@ -9,7 +9,7 @@ import orderRoutes from "./routes/orderRoutes.js";
 import { errorMiddlware } from "./middlewares/errorMiddlewares.js";
 
 const app = express();
-app.use(express.json());
+app.use(express.json({ limit: "10kb" }));
 
 app.use("/auth", authRoutes);
 app.use("/users", userRoutes);
