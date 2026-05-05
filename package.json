@@ -4,6 +4,7 @@
   "description": "API Sonic Store",
   "main": "server.js",
   "scripts": {
+    "start": "node server.js",
     "dev": "nodemon server.js",
     "start:dev": "npx prisma migrate deploy && npx prisma generate && nodemon server.js"
   },

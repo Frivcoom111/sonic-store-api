@@ -1,7 +1,6 @@
-import "dotenv/config";
 import { PrismaPg } from "@prisma/adapter-pg";
 import { PrismaClient } from "../generated/prisma/client.js";
-import { getRequiredEnv } from "../utils/getRequeridEnv.js";
+import { getRequiredEnv } from "../utils/getRequiredEnv.js";
 
 const connectionString = getRequiredEnv("DATABASE_URL");
 

@@ -1,6 +1,4 @@
-import "dotenv/config";
-
-export const getRequiredEnv = (name) => {
+export function getRequiredEnv(name) {
   const value = process.env[name];
 
   if (typeof value !== "string" || value.trim() === "") {
@@ -8,4 +6,4 @@ export const getRequiredEnv = (name) => {
   }
 
   return value;
-};
+}

@@ -71,21 +71,32 @@ class OrderService {
     return order;
   }
 
-  async getOrders(userId, isAdmin) {
+  async getOrders(userId, isAdmin, { page = 1, limit = 20 } = {}) {
     const where = isAdmin ? {} : { userId };
 
-    return await prisma.orders.findMany({
-      where,
-      orderBy: { createdAt: "desc" },
-      include: {
-        items: {
-          include: {
-            product: { select: { id: true, name: true, imageUrl: true, slug: true } },
+    const safePage = Math.max(1, Math.trunc(page));
+    const take = Math.min(Math.max(1, Math.trunc(limit)), 100);
+    const skip = (safePage - 1) * take;
+
+    const [data, total] = await Promise.all([
+      prisma.orders.findMany({
+        where,
+        orderBy: { createdAt: "desc" },
+        skip,
+        take,
+        include: {
+          items: {
+            include: {
+              product: { select: { id: true, name: true, imageUrl: true, slug: true } },
+            },
           },
+          address: true,
         },
-        address: true,
-      },
-    });
+      }),
+      prisma.orders.count({ where }),
+    ]);
+
+    return { data, meta: { total, page: safePage, limit: take, totalPages: Math.ceil(total / take) } };
   }
 
   async getOrderById(id, userId, isAdmin) {
