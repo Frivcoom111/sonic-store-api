@@ -1,6 +1,5 @@
-import "dotenv/config";
 import jwt from "jsonwebtoken";
-import { getRequiredEnv } from "../utils/getRequeridEnv.js";
+import { getRequiredEnv } from "../utils/getRequiredEnv.js";
 import { createError } from "../utils/createError.js";
 import prisma from "../lib/prisma.js";
 
@@ -18,11 +17,11 @@ export const authToken = async (req, res, next) => {
 
     const decoded = jwt.verify(token, JWT_SECRET);
 
-    const user = await prisma.user.findUnique({ where: { id: decoded.id }, select: { isActive: true } });
+    const user = await prisma.user.findUnique({ where: { id: decoded.id }, select: { isActive: true, role: true } });
 
     if (!user || !user.isActive) return next(createError("Usuário desativado, acesso negado.", 401));
 
-    req.user = decoded; // { id, role, isActive }
+    req.user = { id: decoded.id, role: user.role, isActive: user.isActive };
 
     next();
   } catch (error) {

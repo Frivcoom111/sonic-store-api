@@ -5,7 +5,8 @@ import { rateLimit } from "express-rate-limit";
 import swaggerJsdoc from "swagger-jsdoc";
 import swaggerUi from "swagger-ui-express";
 import { swaggerOptions } from "./config/swagger.js";
-import { errorMiddlware } from "./middlewares/errorMiddlewares.js";
+import { errorMiddleware } from "./middlewares/errorMiddlewares.js";
+import { getRequiredEnv } from "./utils/getRequiredEnv.js";
 
 import authRoutes from "./routes/authRoutes.js";
 import userRoutes from "./routes/userRoutes.js";
@@ -20,7 +21,7 @@ const app = express();
 // Quem pode acessar sua API
 app.use(
   cors({
-    origin: process.env.FRONTEND_URL ?? "*",
+    origin: getRequiredEnv("FRONTEND_URL"),
     methods: ["GET", "POST", "PATCH", "DELETE"],
   })
 );
@@ -60,6 +61,6 @@ app.use("/addresses", addressRoutes);
 app.use("/orders", orderRoutes);
 
 // Usado para captura de errors e retornar em JSON ao invés de HTML assim como o Express retorna.
-app.use(errorMiddlware); // ← sempre o ÚLTIMO
+app.use(errorMiddleware); // ← sempre o ÚLTIMO
 
 export default app;

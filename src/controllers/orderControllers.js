@@ -22,9 +22,15 @@ class OrderControllers {
   async getOrders(req, res, next) {
     try {
       const isAdmin = req.user.role === "ADMIN";
-      const orders = await orderServices.getOrders(req.user.id, isAdmin);
 
-      res.status(200).json({ orders });
+      const parsedPage = Number.parseInt(req.query.page, 10);
+      const parsedLimit = Number.parseInt(req.query.limit, 10);
+      const page = Number.isInteger(parsedPage) && parsedPage > 0 ? parsedPage : 1;
+      const limit = Number.isInteger(parsedLimit) && parsedLimit > 0 ? parsedLimit : 20;
+
+      const result = await orderServices.getOrders(req.user.id, isAdmin, { page, limit });
+
+      res.status(200).json(result);
     } catch (error) {
       next(error);
     }
