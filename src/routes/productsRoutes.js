@@ -51,8 +51,8 @@ routes.get("/", productsControllers.getProducts.bind(productsControllers));
  *         name: id
  *         required: true
  *         schema:
- *           type: integer
- *           minimum: 1
+ *           type: string
+ *           format: uuid
  *         description: ID do produto
  *     responses:
  *       200:
@@ -82,9 +82,9 @@ routes.get("/:id", productsControllers.getProductById.bind(productsControllers))
  *             required: [categoryId, name, mark, description, price, stock, imageUrl]
  *             properties:
  *               categoryId:
- *                 type: integer
- *                 minimum: 1
- *                 example: 1
+ *                 type: string
+ *                 format: uuid
+ *                 example: 550e8400-e29b-41d4-a716-446655440000
  *               name:
  *                 type: string
  *                 minLength: 3
@@ -138,8 +138,8 @@ routes.post("/", authToken, authAdminOnly, productsControllers.createProduct.bin
  *         name: id
  *         required: true
  *         schema:
- *           type: integer
- *           minimum: 1
+ *           type: string
+ *           format: uuid
  *         description: ID do produto
  *     requestBody:
  *       required: true
@@ -149,8 +149,8 @@ routes.post("/", authToken, authAdminOnly, productsControllers.createProduct.bin
  *             type: object
  *             properties:
  *               categoryId:
- *                 type: integer
- *                 minimum: 1
+ *                 type: string
+ *                 format: uuid
  *               name:
  *                 type: string
  *                 minLength: 3
@@ -198,8 +198,8 @@ routes.patch("/update/:id", authToken, authAdminOnly, productsControllers.update
  *         name: id
  *         required: true
  *         schema:
- *           type: integer
- *           minimum: 1
+ *           type: string
+ *           format: uuid
  *         description: ID do produto
  *     responses:
  *       200:
@@ -224,8 +224,8 @@ routes.delete("/:id", authToken, authAdminOnly, productsControllers.deleteProduc
  *         name: productId
  *         required: true
  *         schema:
- *           type: integer
- *           minimum: 1
+ *           type: string
+ *           format: uuid
  *         description: ID do produto
  *     responses:
  *       200:
@@ -249,8 +249,8 @@ routes.get("/:productId/images", productImagesControllers.getImages.bind(product
  *         name: productId
  *         required: true
  *         schema:
- *           type: integer
- *           minimum: 1
+ *           type: string
+ *           format: uuid
  *         description: ID do produto
  *     requestBody:
  *       required: true
@@ -290,15 +290,15 @@ routes.post("/:productId/images", authToken, authAdminOnly, productImagesControl
  *         name: productId
  *         required: true
  *         schema:
- *           type: integer
- *           minimum: 1
+ *           type: string
+ *           format: uuid
  *         description: ID do produto
  *       - in: path
  *         name: imageId
  *         required: true
  *         schema:
- *           type: integer
- *           minimum: 1
+ *           type: string
+ *           format: uuid
  *         description: ID da imagem
  *     responses:
  *       200:

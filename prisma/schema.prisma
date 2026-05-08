@@ -1,8 +1,6 @@
 // This is your Prisma schema file,
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
-// Get a free hosted Postgres database in seconds: `npx create-db`
-
 generator client {
   provider = "prisma-client-js"
   output   = "../src/generated/prisma"
@@ -26,7 +24,7 @@ enum OrderStatus {
 }
 
 model User {
-  id        Int      @id @default(autoincrement())
+  id        String   @id @default(uuid())
   name      String   @db.VarChar(100)
   email     String   @unique @db.VarChar(100)
   password  String   @db.VarChar(100)
@@ -41,8 +39,8 @@ model User {
 }
 
 model Address {
-  id         Int      @id @default(autoincrement())
-  userId     Int
+  id         String   @id @default(uuid())
+  userId     String
   street     String   @db.VarChar(100)
   number     Int      @db.Integer
   complement String?  @db.VarChar(100)
@@ -57,7 +55,7 @@ model Address {
 }
 
 model Category {
-  id        Int      @id @default(autoincrement())
+  id        String   @id @default(uuid())
   name      String   @unique @db.VarChar(100)
   slug      String   @unique @db.VarChar(100)
   createdAt DateTime @default(now())
@@ -67,8 +65,8 @@ model Category {
 }
 
 model Product {
-  id          Int      @id @default(autoincrement())
-  categoryId  Int
+  id          String   @id @default(uuid())
+  categoryId  String
   name        String   @db.VarChar(100)
   mark        String   @db.VarChar(100)
   description String
@@ -86,16 +84,16 @@ model Product {
 }
 
 model ProductImage {
-  id        Int    @id @default(autoincrement())
-  productId Int
+  id        String @id @default(uuid())
+  productId String
   url       String
 
   product Product @relation(fields: [productId], references: [id])
 }
 
 model Cart {
-  id        Int      @id @default(autoincrement())
-  userId    Int      @unique
+  id        String   @id @default(uuid())
+  userId    String   @unique
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -104,9 +102,9 @@ model Cart {
 }
 
 model CartItem {
-  id        Int @id @default(autoincrement())
-  cartId    Int
-  productId Int
+  id        String @id @default(uuid())
+  cartId    String
+  productId String
   quantity  Int
 
   cart    Cart    @relation(fields: [cartId], references: [id])
@@ -116,9 +114,9 @@ model CartItem {
 }
 
 model Orders {
-  id          Int         @id @default(autoincrement())
-  userId      Int
-  addressId   Int
+  id          String      @id @default(uuid())
+  userId      String
+  addressId   String
   orderStatus OrderStatus
   total       Decimal     @db.Decimal(10, 2)
   createdAt   DateTime    @default(now())
@@ -130,9 +128,9 @@ model Orders {
 }
 
 model OrderItem {
-  id          Int     @id @default(autoincrement())
-  orderId     Int
-  productId   Int
+  id          String  @id @default(uuid())
+  orderId     String
+  productId   String
   quantity    Int
   priceAtTime Decimal @db.Decimal(10, 2)
 

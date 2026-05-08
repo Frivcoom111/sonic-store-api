@@ -1,7 +1,7 @@
 import { z } from "zod";
 
 export const createOrderSchema = z.object({
-  addressId: z.number().int().positive("addressId inválido."),
+  addressId: z.string().min(1, "addressId inválido."),
 });
 
 export const updateOrderStatusSchema = z.object({

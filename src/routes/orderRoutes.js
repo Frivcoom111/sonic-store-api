@@ -22,10 +22,10 @@ const routes = express.Router();
  *             required: [addressId]
  *             properties:
  *               addressId:
- *                 type: integer
- *                 minimum: 1
+ *                 type: string
+ *                 format: uuid
  *                 description: ID do endereço de entrega (deve pertencer ao usuário)
- *                 example: 1
+ *                 example: 550e8400-e29b-41d4-a716-446655440000
  *     responses:
  *       201:
  *         description: Pedido criado com sucesso
@@ -72,8 +72,8 @@ routes.get("/", authToken, orderControllers.getOrders.bind(orderControllers));
  *         name: id
  *         required: true
  *         schema:
- *           type: integer
- *           minimum: 1
+ *           type: string
+ *           format: uuid
  *         description: ID do pedido
  *     responses:
  *       200:
@@ -101,8 +101,8 @@ routes.get("/:id", authToken, orderControllers.getOrderById.bind(orderController
  *         name: id
  *         required: true
  *         schema:
- *           type: integer
- *           minimum: 1
+ *           type: string
+ *           format: uuid
  *         description: ID do pedido
  *     requestBody:
  *       required: true
@@ -142,8 +142,8 @@ routes.patch("/:id/status", authToken, authAdminOnly, orderControllers.updateOrd
  *         name: id
  *         required: true
  *         schema:
- *           type: integer
- *           minimum: 1
+ *           type: string
+ *           format: uuid
  *         description: ID do pedido
  *     responses:
  *       200:

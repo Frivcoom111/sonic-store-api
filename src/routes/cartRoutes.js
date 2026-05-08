@@ -37,9 +37,9 @@ routes.get("/", authToken, cartControllers.getCart.bind(cartControllers));
  *             required: [productId, quantity]
  *             properties:
  *               productId:
- *                 type: integer
- *                 minimum: 1
- *                 example: 3
+ *                 type: string
+ *                 format: uuid
+ *                 example: 550e8400-e29b-41d4-a716-446655440000
  *               quantity:
  *                 type: integer
  *                 minimum: 1
@@ -71,8 +71,8 @@ routes.post("/", authToken, cartControllers.addItem.bind(cartControllers));
  *         name: productId
  *         required: true
  *         schema:
- *           type: integer
- *           minimum: 1
+ *           type: string
+ *           format: uuid
  *         description: ID do produto no carrinho
  *     requestBody:
  *       required: true
@@ -113,8 +113,8 @@ routes.patch("/:productId", authToken, cartControllers.updateItem.bind(cartContr
  *         name: productId
  *         required: true
  *         schema:
- *           type: integer
- *           minimum: 1
+ *           type: string
+ *           format: uuid
  *         description: ID do produto a remover
  *     responses:
  *       200:
