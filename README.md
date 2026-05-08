@@ -1,6 +1,6 @@
-# Sonic Store API
+# Node.js REST API Template
 
-REST API de e-commerce para gerenciamento de produtos, pedidos, usuários e carrinho de compras.
+Template de REST API para e-commerce com autenticação, controle de acesso, documentação automática e testes unitários.
 
 ## Tecnologias
 
@@ -10,7 +10,7 @@ REST API de e-commerce para gerenciamento de produtos, pedidos, usuários e carr
 - **Zod** para validação de dados
 - **Bcrypt** para hash de senhas
 - **Helmet** + **CORS** + **express-rate-limit** para segurança
-- **Swagger UI** para documentação interativa
+- **Swagger UI** para documentação interativa (desabilitado em produção)
 - **Vitest** para testes unitários
 
 ## Pré-requisitos
@@ -24,13 +24,16 @@ REST API de e-commerce para gerenciamento de produtos, pedidos, usuários e carr
 npm install
 ```
 
-Crie um arquivo `.env` na raiz com as variáveis:
+Crie um arquivo `.env` na raiz com base no `.env.example`:
 
 ```env
-DATABASE_URL="postgresql://user:password@host:5432/sonic_store"
+DATABASE_URL="postgresql://user:password@host:5432/mydb"
 JWT_SECRET="seu_secret_aqui"
 JWT_EXPIRES_IN="7d"
+FRONTEND_URL="http://localhost:5173"
+SALT=10
 PORT=3000
+NODE_ENV=development
 ```
 
 ## Scripts
@@ -71,11 +74,11 @@ npm run prisma seed
 | `/orders` | Pedidos |
 | `/addresses` | Endereços do usuário |
 
-Documentação interativa disponível em `/api-docs` com o servidor rodando.
+Documentação interativa disponível em `/api-docs` (apenas em desenvolvimento).
 
 ## Testes
 
-Apenas testes unitários. Cobrem utilitários (`createError`, `generateSlug`, `generateToken`), validators (`authValidators`, `globalValidators`) e lógica de negócio sem dependência de banco de dados.
+Testes unitários cobrindo utilitários (`createError`, `generateSlug`, `generateToken`), validators (`authValidators`, `globalValidators`) e lógica de negócio sem dependência de banco de dados.
 
 ```bash
 npm test
@@ -94,5 +97,6 @@ src/
 ├── lib/           # Prisma client
 └── tests/unit/    # Testes unitários
 prisma/
-└── schema.prisma  # Schema do banco
+├── schema.prisma  # Schema do banco
+└── seeds.js       # Dados iniciais
 ```

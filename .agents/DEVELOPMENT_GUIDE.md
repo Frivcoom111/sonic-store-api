@@ -1,4 +1,4 @@
-# 🛒 Sonic Store API — Guia de Desenvolvimento
+# REST API Template — Guia de Desenvolvimento
 
 > Guia baseado no código real do projeto. Tudo aqui reflete a estrutura e padrões que você já está usando.
 
@@ -25,7 +25,7 @@
 ## Estrutura de Pastas Real
 
 ```
-sonic-store-api/
+api-template/
 ├── server.js                          # Ponto de entrada — só sobe o servidor
 ├── prisma.config.js                   # Configuração do Prisma CLI
 ├── package.json
@@ -548,7 +548,7 @@ SALT=
 ### Valores recomendados para desenvolvimento
 
 ```env
-DATABASE_URL="postgresql://postgres:suasenha@localhost:5432/sonic_store"
+DATABASE_URL="postgresql://postgres:suasenha@localhost:5432/mydb"
 JWT_SECRET="uma-string-longa-aleatoria-de-pelo-menos-32-caracteres"
 JWT_EXPIRES_IN="7d"
 FRONTEND_URL="http://localhost:5173"

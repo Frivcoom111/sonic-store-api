@@ -1,7 +1,7 @@
 {
-  "name": "sonic-store-api",
+  "name": "node-rest-api-template",
   "version": "1.0.0",
-  "description": "API Sonic Store",
+  "description": "Template de REST API com Node.js, Express, Prisma e JWT",
   "main": "server.js",
   "scripts": {
     "test": "cross-env NODE_ENV=test vitest run",
