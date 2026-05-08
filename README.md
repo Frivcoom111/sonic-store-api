@@ -56,7 +56,7 @@ npx prisma migrate dev --name init
 npx prisma generate
 
 # Seed (opcional)
-npm run prisma seed
+> IDs usam UUID em formato string, gerado automaticamente pelo Prisma Client.
 ```
 
 > IDs usam UUID (string) gerado automaticamente pelo banco.
