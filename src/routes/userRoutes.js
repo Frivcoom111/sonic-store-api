@@ -151,8 +151,8 @@ routes.patch("/update/password", authToken, userControllers.updateUserPassword.b
  *         name: id
  *         required: true
  *         schema:
- *           type: integer
- *           minimum: 1
+ *           type: string
+ *           format: uuid
  *         description: ID do usuário
  *     requestBody:
  *       required: true
@@ -192,8 +192,8 @@ routes.patch("/update/:id/role", authToken, authAdminOnly, userControllers.updat
  *         name: id
  *         required: true
  *         schema:
- *           type: integer
- *           minimum: 1
+ *           type: string
+ *           format: uuid
  *         description: ID do usuário
  *     responses:
  *       200:

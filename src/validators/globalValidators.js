@@ -1,5 +1,5 @@
 import { z } from "zod";
 
 export const idParamsSchema = z.object({
-    id: z.coerce.number().int().positive("ID inválido."),
+    id: z.string().uuid("ID inválido."),
 });

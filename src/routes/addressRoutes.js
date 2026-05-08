@@ -33,8 +33,8 @@ routes.get("/", authToken, addressControllers.getAddresses.bind(addressControlle
  *         name: id
  *         required: true
  *         schema:
- *           type: integer
- *           minimum: 1
+ *           type: string
+ *           format: uuid
  *         description: ID do endereço
  *     responses:
  *       200:
@@ -109,8 +109,8 @@ routes.post("/", authToken, addressControllers.createAddress.bind(addressControl
  *         name: id
  *         required: true
  *         schema:
- *           type: integer
- *           minimum: 1
+ *           type: string
+ *           format: uuid
  *         description: ID do endereço
  *     requestBody:
  *       required: true
@@ -160,8 +160,8 @@ routes.patch("/:id", authToken, addressControllers.updateAddress.bind(addressCon
  *         name: id
  *         required: true
  *         schema:
- *           type: integer
- *           minimum: 1
+ *           type: string
+ *           format: uuid
  *         description: ID do endereço
  *     responses:
  *       200:

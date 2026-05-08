@@ -66,8 +66,8 @@ routes.post("/", authToken, authAdminOnly, categoriesControllers.createCategory.
  *         name: id
  *         required: true
  *         schema:
- *           type: integer
- *           minimum: 1
+ *           type: string
+ *           format: uuid
  *         description: ID da categoria
  *     requestBody:
  *       required: true
@@ -106,8 +106,8 @@ routes.patch("/update/:id", authToken, authAdminOnly, categoriesControllers.upda
  *         name: id
  *         required: true
  *         schema:
- *           type: integer
- *           minimum: 1
+ *           type: string
+ *           format: uuid
  *         description: ID da categoria
  *     responses:
  *       200:

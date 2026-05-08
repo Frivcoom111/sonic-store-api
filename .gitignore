@@ -1,9 +1,24 @@
+# Dependencies
 /node_modules
+
+# Environment
 .env
+.env.*
+!.env.example
+
+# Prisma generated client
 /src/generated/prisma
 /generated/prisma
+
+# Logs
+*.log
+npm-debug.log*
+
+# Editor / IDE
 .vscode
 .prettierrc
+
+# Claude Code tooling
 .claude
-# Added by code-review-graph
+CLAUDE.md
 .code-review-graph/

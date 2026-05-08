@@ -47,9 +47,10 @@ app.use("/auth", authLimiter)
 
 app.use(express.json({ limit: "10kb" })); // Limite de arquivos que podem ser enviados na request.
 
-// Configuração do swagger para documentar minha API.
-const swaggerSpec = swaggerJsdoc(swaggerOptions);
-app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+if (process.env.NODE_ENV !== 'production') {
+  const swaggerSpec = swaggerJsdoc(swaggerOptions);
+  app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+}
 
 // Rotas API.
 app.use("/auth", authRoutes);

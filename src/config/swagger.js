@@ -5,9 +5,9 @@ const { version } = require("../../package.json");
 const swaggerDefinition = {
   openapi: "3.0.0",
   info: {
-    title: "Sonic Store API",
+    title: "REST API Template",
     version,
-    description: "API de e-commerce da Sonic Store",
+    description: "Template de REST API com Node.js, Express, Prisma e JWT",
   },
   servers: [
     { url: "http://localhost:3000", description: "Desenvolvimento" },
