@@ -1,15 +1,15 @@
-import { getRequiredEnv } from "../../utils/getRequiredEnv.js";
 import { describe, it, expect, beforeAll } from "vitest";
 import jwt from "jsonwebtoken";
 
-// Simula a variável de ambiente antes de importar
-beforeAll(() => {
-  process.env.JWT_SECRET = getRequiredEnv("JWT_SECRET");
-  process.env.JWT_EXPIRES_IN = getRequiredEnv("JWT_EXPIRES_IN");
-});
+let generateToken;
 
-// Import dinâmico porque depende do env
-const { generateToken } = await import("../../utils/generateToken.js");
+// Define o env de teste antes de importar o módulo que depende dele
+beforeAll(async () => {
+  process.env.JWT_SECRET = "test-jwt-secret";
+  process.env.JWT_EXPIRES_IN = "1h";
+
+  ({ generateToken } = await import("../../utils/generateToken.js"));
+});
 
 describe("generateToken", () => {
   it("gera um token JWT válido", () => {
