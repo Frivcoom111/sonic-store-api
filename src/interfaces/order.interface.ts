@@ -1,5 +1,5 @@
-import type { OrderStatus, Prisma } from "../generated/prisma/client.js";
-import type { AddressResponse } from "./address.interface.js";
+import type { OrderStatus, Prisma } from "../generated/prisma/client";
+import type { AddressResponse } from "./address.interface";
 
 export interface CreateOrderDTO {
   addressId: string;

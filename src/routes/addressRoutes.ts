@@ -1,6 +1,6 @@
 import express from "express";
-import { authToken } from "../middlewares/authMiddlewares.js";
-import addressControllers from "../controllers/addressControllers.js";
+import { authToken } from "../middlewares/authMiddlewares";
+import addressControllers from "../controllers/addressControllers";
 
 const routes = express.Router();
 

@@ -1,12 +1,12 @@
 import type { NextFunction, Request, Response } from "express";
-import userService from "../services/userServices.js";
-import { idParamsSchema } from "../validators/globalValidators.js";
+import userService from "../services/userServices";
+import { idParamsSchema } from "../validators/globalValidators";
 import {
   userCreateSchema,
   userUpdatePasswordSchema,
   userUpdateRoleSchema,
   userUpdateSchema,
-} from "../validators/userValidators.js";
+} from "../validators/userValidators";
 import type {
   CreateUserDTO,
   ToggleUserDTO,
@@ -15,7 +15,7 @@ import type {
   UpdateUserRoleDTO,
   UserListResponse,
   UserResponse,
-} from "../interfaces/user.interface.js";
+} from "../interfaces/user.interface";
 
 class UserController {
   async createUser(req: Request, res: Response, next: NextFunction): Promise<void> {

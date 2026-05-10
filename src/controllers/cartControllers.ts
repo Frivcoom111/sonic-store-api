@@ -1,12 +1,12 @@
 import type { NextFunction, Request, Response } from "express";
-import cartServices from "../services/cartServices.js";
-import { addCartItemSchema, updateCartItemSchema } from "../validators/cartValidators.js";
-import { idParamsSchema } from "../validators/globalValidators.js";
+import cartServices from "../services/cartServices";
+import { addCartItemSchema, updateCartItemSchema } from "../validators/cartValidators";
+import { idParamsSchema } from "../validators/globalValidators";
 import type {
   AddToCartDTO,
   CartResponse,
   UpdateCartItemDTO,
-} from "../interfaces/cart.interface.js";
+} from "../interfaces/cart.interface";
 
 class CartControllers {
   async getCart(req: Request, res: Response, next: NextFunction): Promise<void> {

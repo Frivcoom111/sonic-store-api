@@ -1,15 +1,15 @@
-import prisma from "../lib/prisma.js";
-import { compareHashPassword } from "../utils/compareHashPassword.js";
-import { generateHashPassword } from "../utils/generateHashPassword.js";
-import { generateToken } from "../utils/generateToken.js";
-import { createError } from "../utils/createError.js";
-import type { Prisma } from "../generated/prisma/client.js";
+import prisma from "../lib/prisma";
+import { compareHashPassword } from "../utils/compareHashPassword";
+import { generateHashPassword } from "../utils/generateHashPassword";
+import { generateToken } from "../utils/generateToken";
+import { createError } from "../utils/createError";
+import type { Prisma } from "../generated/prisma/client";
 import type {
   LoginDTO,
   LoginResponse,
   RegisterDTO,
-} from "../interfaces/auth.interface.js";
-import type { UserResponse } from "../interfaces/user.interface.js";
+} from "../interfaces/auth.interface";
+import type { UserResponse } from "../interfaces/user.interface";
 
 class AuthService {
   async register({ name, email, password }: RegisterDTO): Promise<UserResponse> {

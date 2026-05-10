@@ -1,12 +1,12 @@
 import type { NextFunction, Request, Response } from "express";
-import categoriesServices from "../services/categoriesServices.js";
-import { categoryCreateSchema, categoryUpdateSchema } from "../validators/categoriesValidators.js";
-import { idParamsSchema } from "../validators/globalValidators.js";
+import categoriesServices from "../services/categoriesServices";
+import { categoryCreateSchema, categoryUpdateSchema } from "../validators/categoriesValidators";
+import { idParamsSchema } from "../validators/globalValidators";
 import type {
   CategoryResponse,
   CreateCategoryDTO,
   UpdateCategoryDTO,
-} from "../interfaces/category.interface.js";
+} from "../interfaces/category.interface";
 
 class CategoriesControllers {
   async createCategory(req: Request, res: Response, next: NextFunction): Promise<void> {

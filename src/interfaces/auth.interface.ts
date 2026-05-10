@@ -1,4 +1,4 @@
-import type { UserResponse } from "./user.interface.js";
+import type { UserResponse } from "./user.interface";
 
 export interface RegisterDTO {
   name: string;

@@ -1,6 +1,6 @@
 import "dotenv/config";
 import bcrypt from "bcrypt";
-import { getRequiredEnv } from "./getRequiredEnv.js";
+import { getRequiredEnv } from "./getRequiredEnv";
 
 const SALT = parseInt(getRequiredEnv("SALT"));
 

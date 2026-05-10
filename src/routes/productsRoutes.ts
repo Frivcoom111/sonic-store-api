@@ -1,7 +1,7 @@
 import express from "express";
-import { authToken, authAdminOnly } from "../middlewares/authMiddlewares.js";
-import productsControllers from "../controllers/productsControllers.js";
-import productImagesControllers from "../controllers/productImagesControllers.js";
+import { authToken, authAdminOnly } from "../middlewares/authMiddlewares";
+import productsControllers from "../controllers/productsControllers";
+import productImagesControllers from "../controllers/productImagesControllers";
 
 const routes = express.Router();
 

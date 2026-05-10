@@ -6,10 +6,10 @@
   "scripts": {
     "test": "cross-env NODE_ENV=test vitest run",
     "test:watch": "cross-env NODE_ENV=test vitest",
-    "dev": "tsx watch server.ts",
+    "dev": "tsx watch src/server.ts",
     "build": "tsc",
     "start": "node dist/server.js",
-    "start:dev": "npx prisma migrate deploy && npx prisma generate && tsx watch server.ts"
+    "start:dev": "npx prisma migrate deploy && npx prisma generate && tsx watch src/server.ts"
   },
   "prisma": {
     "seed": "npx tsx prisma/seeds.ts"
@@ -40,6 +40,8 @@
     "@types/jsonwebtoken": "^9.0.10",
     "@types/multer": "^2.1.0",
     "@types/node": "^25.6.2",
+    "@types/swagger-jsdoc": "^6.0.4",
+    "@types/swagger-ui-express": "^4.1.8",
     "cross-env": "^10.1.0",
     "dotenv-flow": "^4.1.0",
     "nodemon": "^3.1.14",

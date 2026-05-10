@@ -1,11 +1,11 @@
-import prisma from "../lib/prisma.js";
-import { generateSlug } from "../utils/generateSlug.js";
-import { createError } from "../utils/createError.js";
-import type { Prisma } from "../generated/prisma/client.js";
+import prisma from "../lib/prisma";
+import { generateSlug } from "../utils/generateSlug";
+import { createError } from "../utils/createError";
+import type { Prisma } from "../generated/prisma/client";
 import type {
   CategoryResponse,
   UpdateCategoryDTO,
-} from "../interfaces/category.interface.js";
+} from "../interfaces/category.interface";
 
 const categorySelect = {
   id: true,

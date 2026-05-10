@@ -1,12 +1,12 @@
 import type { NextFunction, Request, Response } from "express";
-import addressServices from "../services/addressServices.js";
-import { createAddressSchema, updateAddressSchema } from "../validators/addressValidators.js";
-import { idParamsSchema } from "../validators/globalValidators.js";
+import addressServices from "../services/addressServices";
+import { createAddressSchema, updateAddressSchema } from "../validators/addressValidators";
+import { idParamsSchema } from "../validators/globalValidators";
 import type {
   AddressResponse,
   CreateAddressDTO,
   UpdateAddressDTO,
-} from "../interfaces/address.interface.js";
+} from "../interfaces/address.interface";
 
 class AddressControllers {
   async getAddresses(req: Request, res: Response, next: NextFunction): Promise<void> {

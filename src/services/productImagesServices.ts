@@ -1,6 +1,6 @@
-import prisma from "../lib/prisma.js";
-import { createError } from "../utils/createError.js";
-import type { ProductImageResponse } from "../interfaces/product.interface.js";
+import prisma from "../lib/prisma";
+import { createError } from "../utils/createError";
+import type { ProductImageResponse } from "../interfaces/product.interface";
 
 class ProductImagesService {
   async add(productId: string, url: string): Promise<ProductImageResponse> {

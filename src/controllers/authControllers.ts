@@ -1,12 +1,12 @@
 import type { NextFunction, Request, Response } from "express";
-import authService from "../services/authServices.js";
-import { loginSchema, registerSchema } from "../validators/authValidators.js";
+import authService from "../services/authServices";
+import { loginSchema, registerSchema } from "../validators/authValidators";
 import type {
   LoginDTO,
   LoginResponse,
   RegisterDTO,
-} from "../interfaces/auth.interface.js";
-import type { UserResponse } from "../interfaces/user.interface.js";
+} from "../interfaces/auth.interface";
+import type { UserResponse } from "../interfaces/user.interface";
 
 class AuthController {
   async register(req: Request, res: Response, next: NextFunction): Promise<void> {

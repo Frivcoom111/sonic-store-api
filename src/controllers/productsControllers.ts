@@ -1,14 +1,14 @@
 import type { NextFunction, Request, Response } from "express";
-import productsServices from "../services/productsServices.js";
-import { productSchema, updateProductSchema } from "../validators/productsValidators.js";
-import { idParamsSchema } from "../validators/globalValidators.js";
+import productsServices from "../services/productsServices";
+import { productSchema, updateProductSchema } from "../validators/productsValidators";
+import { idParamsSchema } from "../validators/globalValidators";
 import type {
   CreateProductDTO,
   ProductDeleteResponse,
   ProductListResponse,
   ProductResponse,
   UpdateProductDTO,
-} from "../interfaces/product.interface.js";
+} from "../interfaces/product.interface";
 
 class ProductsControllers {
   async createProduct(req: Request, res: Response, next: NextFunction): Promise<void> {

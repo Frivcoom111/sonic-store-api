@@ -1,6 +1,6 @@
 import "dotenv/config";
-import app from "./app.js";
-import { getRequiredEnv } from "./utils/getRequiredEnv.js"; 
+import app from "./app";
+import { getRequiredEnv } from "./utils/getRequiredEnv"; 
 
 const PORT = parseInt(getRequiredEnv("PORT")) ?? 3000;
 

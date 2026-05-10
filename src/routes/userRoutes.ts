@@ -1,6 +1,6 @@
 import express from "express";
-import { authAdminOnly, authToken } from "../middlewares/authMiddlewares.js";
-import userControllers from "../controllers/userControllers.js";
+import { authAdminOnly, authToken } from "../middlewares/authMiddlewares";
+import userControllers from "../controllers/userControllers";
 
 const routes = express.Router();
 

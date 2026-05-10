@@ -1,6 +1,6 @@
 import express from "express";
-import cartControllers from "../controllers/cartControllers.js";
-import { authToken } from "../middlewares/authMiddlewares.js";
+import cartControllers from "../controllers/cartControllers";
+import { authToken } from "../middlewares/authMiddlewares";
 
 const routes = express.Router();
 

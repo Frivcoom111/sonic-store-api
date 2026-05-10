@@ -1,11 +1,11 @@
 import type { NextFunction, Request, Response } from "express";
-import productImagesServices from "../services/productImagesServices.js";
-import { productImageSchema } from "../validators/productImagesValidators.js";
-import { idParamsSchema } from "../validators/globalValidators.js";
+import productImagesServices from "../services/productImagesServices";
+import { productImageSchema } from "../validators/productImagesValidators";
+import { idParamsSchema } from "../validators/globalValidators";
 import type {
   AddProductImageDTO,
   ProductImageResponse,
-} from "../interfaces/product.interface.js";
+} from "../interfaces/product.interface";
 
 class ProductImagesControllers {
   async getImages(req: Request, res: Response, next: NextFunction): Promise<void> {

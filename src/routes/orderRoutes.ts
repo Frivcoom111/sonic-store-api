@@ -1,6 +1,6 @@
 import express from "express";
-import orderControllers from "../controllers/orderControllers.js";
-import { authToken, authAdminOnly } from "../middlewares/authMiddlewares.js";
+import orderControllers from "../controllers/orderControllers";
+import { authToken, authAdminOnly } from "../middlewares/authMiddlewares";
 
 const routes = express.Router();
 

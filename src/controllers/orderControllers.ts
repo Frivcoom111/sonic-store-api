@@ -1,13 +1,13 @@
 import type { NextFunction, Request, Response } from "express";
-import orderServices from "../services/orderServices.js";
-import { createOrderSchema, updateOrderStatusSchema } from "../validators/orderValidators.js";
-import { idParamsSchema } from "../validators/globalValidators.js";
+import orderServices from "../services/orderServices";
+import { createOrderSchema, updateOrderStatusSchema } from "../validators/orderValidators";
+import { idParamsSchema } from "../validators/globalValidators";
 import type {
   CreateOrderDTO,
   OrderListResponse,
   OrderResponse,
   UpdateOrderStatusDTO,
-} from "../interfaces/order.interface.js";
+} from "../interfaces/order.interface";
 
 class OrderControllers {
   async createOrder(req: Request, res: Response, next: NextFunction): Promise<void> {

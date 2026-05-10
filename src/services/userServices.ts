@@ -1,8 +1,8 @@
-import prisma from "../lib/prisma.js";
-import { generateHashPassword } from "../utils/generateHashPassword.js";
-import { compareHashPassword } from "../utils/compareHashPassword.js";
-import { createError } from "../utils/createError.js";
-import type { Prisma } from "../generated/prisma/client.js";
+import prisma from "../lib/prisma";
+import { generateHashPassword } from "../utils/generateHashPassword";
+import { compareHashPassword } from "../utils/compareHashPassword";
+import { createError } from "../utils/createError";
+import type { Prisma } from "../generated/prisma/client";
 import type {
   CreateUserDTO,
   ToggleUserDTO,
@@ -11,7 +11,7 @@ import type {
   UpdateUserRoleDTO,
   UserListResponse,
   UserResponse,
-} from "../interfaces/user.interface.js";
+} from "../interfaces/user.interface";
 
 const userSelect = {
   id: true,

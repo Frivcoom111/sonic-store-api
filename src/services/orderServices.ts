@@ -1,10 +1,10 @@
-import prisma from "../lib/prisma.js";
-import { Prisma, type OrderStatus } from "../generated/prisma/client.js";
-import { createError } from "../utils/createError.js";
+import prisma from "../lib/prisma";
+import { Prisma, type OrderStatus } from "../generated/prisma/client";
+import { createError } from "../utils/createError";
 import type {
   OrderListResponse,
   OrderResponse,
-} from "../interfaces/order.interface.js";
+} from "../interfaces/order.interface";
 
 const orderInclude = {
   items: {

@@ -1,8 +1,8 @@
 import type { NextFunction, Request, RequestHandler, Response } from "express";
 import jwt from "jsonwebtoken";
-import { getRequiredEnv } from "../utils/getRequiredEnv.js";
-import { createError } from "../utils/createError.js";
-import prisma from "../lib/prisma.js";
+import { getRequiredEnv } from "../utils/getRequiredEnv";
+import { createError } from "../utils/createError";
+import prisma from "../lib/prisma";
 
 const JWT_SECRET = getRequiredEnv("JWT_SECRET");
 

@@ -4,17 +4,17 @@ import helmet from "helmet";
 import { rateLimit } from "express-rate-limit";
 import swaggerJsdoc from "swagger-jsdoc";
 import swaggerUi from "swagger-ui-express";
-import { swaggerOptions } from "./config/swagger.js";
-import { errorMiddleware } from "./middlewares/errorMiddlewares.js";
-import { getRequiredEnv } from "./utils/getRequiredEnv.js";
+import { swaggerOptions } from "./config/swagger";
+import { errorMiddleware } from "./middlewares/errorMiddlewares";
+import { getRequiredEnv } from "./utils/getRequiredEnv";
 
-import authRoutes from "./routes/authRoutes.js";
-import userRoutes from "./routes/userRoutes.js";
-import categoriesRoutes from "./routes/categoriesRoutes.js";
-import productsRoutes from "./routes/productsRoutes.js";
-import cartRoutes from "./routes/cartRoutes.js";
-import addressRoutes from "./routes/addressRoutes.js";
-import orderRoutes from "./routes/orderRoutes.js";
+import authRoutes from "./routes/authRoutes";
+import userRoutes from "./routes/userRoutes";
+import categoriesRoutes from "./routes/categoriesRoutes";
+import productsRoutes from "./routes/productsRoutes";
+import cartRoutes from "./routes/cartRoutes";
+import addressRoutes from "./routes/addressRoutes";
+import orderRoutes from "./routes/orderRoutes";
 
 const app = express();
 

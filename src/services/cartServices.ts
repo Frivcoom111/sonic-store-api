@@ -1,7 +1,7 @@
-import prisma from "../lib/prisma.js";
-import { Prisma } from "../generated/prisma/client.js";
-import { createError } from "../utils/createError.js";
-import type { CartResponse } from "../interfaces/cart.interface.js";
+import prisma from "../lib/prisma";
+import { Prisma } from "../generated/prisma/client";
+import { createError } from "../utils/createError";
+import type { CartResponse } from "../interfaces/cart.interface";
 
 class CartService {
   async #getOrCreateCart(userId: string) {

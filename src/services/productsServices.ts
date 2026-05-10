@@ -1,14 +1,14 @@
-import prisma from "../lib/prisma.js";
-import { generateSlug } from "../utils/generateSlug.js";
-import { createError } from "../utils/createError.js";
-import type { Prisma } from "../generated/prisma/client.js";
+import prisma from "../lib/prisma";
+import { generateSlug } from "../utils/generateSlug";
+import { createError } from "../utils/createError";
+import type { Prisma } from "../generated/prisma/client";
 import type {
   CreateProductDTO,
   ProductDeleteResponse,
   ProductListResponse,
   ProductResponse,
   UpdateProductDTO,
-} from "../interfaces/product.interface.js";
+} from "../interfaces/product.interface";
 
 const productSelect = {
   id: true,

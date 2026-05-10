@@ -1,10 +1,10 @@
-import prisma from "../lib/prisma.js";
-import { createError } from "../utils/createError.js";
+import prisma from "../lib/prisma";
+import { createError } from "../utils/createError";
 import type {
   AddressResponse,
   CreateAddressDTO,
   UpdateAddressDTO,
-} from "../interfaces/address.interface.js";
+} from "../interfaces/address.interface";
 
 const addressSelect = {
   id: true,
