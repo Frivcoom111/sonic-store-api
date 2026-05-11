@@ -32,14 +32,15 @@ services:
       timeout: 5s
       retries: 5
 
-  regis: 
-    image: redis:8.8-m03-alpine
+  redis: 
+    image: redis:7-alpine
     ports:
       - "6379:6379"
     environment:
       - REDIS_PASSWORD=${REDIS_PASSWORD:-root123}
     volumes:
-      -dados_db:/var/lib/redis/data
+      - dados_redis:/var/lib/redis/data
 
 volumes:
   dados_db:
+  dados_redis:
