@@ -58,18 +58,32 @@ class ProductsService {
     }
   }
 
-  async delete(id: string): Promise<ProductDeleteResponse> {
-    try {
-      return await prisma.product.delete({
+  async delete(id: string): Promise<ProductDeleteResponse & { softDeleted: boolean }> {
+    const product = await prisma.product.findUnique({
+      where: { id },
+      select: { id: true, name: true, slug: true, isActive: true },
+    });
+
+    if (!product) throw createError("Produto não encontrado.", 404);
+    if (!product.isActive) throw createError("Produto já foi removido.", 409);
+
+    const linkedOrderItems = await prisma.orderItem.count({ where: { productId: id } });
+
+    if (linkedOrderItems > 0) {
+      const updated = await prisma.product.update({
         where: { id },
+        data: { isActive: false },
         select: { id: true, name: true, slug: true },
       });
-    } catch (error) {
-      const code = (error as Prisma.PrismaClientKnownRequestError).code;
-      if (code === "P2025") throw createError("Produto não encontrado.", 404);
-      if (code === "P2003") throw createError("Produto possui pedidos ou itens de carrinho vinculados.", 409);
-      throw error;
+      await prisma.cartItem.deleteMany({ where: { productId: id } });
+      return { ...updated, softDeleted: true };
     }
+
+    const deleted = await prisma.product.delete({
+      where: { id },
+      select: { id: true, name: true, slug: true },
+    });
+    return { ...deleted, softDeleted: false };
   }
 
   async getAll({
@@ -86,7 +100,7 @@ class ProductsService {
     const safePage = Math.max(1, Math.trunc(page));
     const take = Math.min(Math.max(1, Math.trunc(limit)), 100);
     const skip = (safePage - 1) * take;
-    const where: Prisma.ProductWhereInput = {};
+    const where: Prisma.ProductWhereInput = { isActive: true };
 
     if (categorySlug) where.category = { slug: categorySlug };
 
@@ -112,8 +126,8 @@ class ProductsService {
   }
 
   async getById(id: string): Promise<ProductResponse> {
-    const product = await prisma.product.findUnique({
-      where: { id },
+    const product = await prisma.product.findFirst({
+      where: { id, isActive: true },
       select: {
         ...productSelect,
         images: { select: { id: true, url: true } },

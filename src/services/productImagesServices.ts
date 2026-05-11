@@ -5,7 +5,7 @@ import type { ProductImageResponse } from "../interfaces/product.interface";
 class ProductImagesService {
   async add(productId: string, url: string): Promise<ProductImageResponse> {
     const product = await prisma.product.findUnique({ where: { id: productId } });
-    if (!product) throw createError("Produto não encontrado.", 404);
+    if (!product || !product.isActive) throw createError("Produto não encontrado.", 404);
 
     return await prisma.productImage.create({
       data: { productId, url },
@@ -27,8 +27,8 @@ class ProductImagesService {
   }
 
   async getByProduct(productId: string): Promise<{ images: ProductImageResponse[] }> {
-    const product = await prisma.product.findUnique({
-      where: { id: productId },
+    const product = await prisma.product.findFirst({
+      where: { id: productId, isActive: true },
       select: { images: { select: { id: true, url: true } } },
     });
 

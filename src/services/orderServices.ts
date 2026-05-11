@@ -34,6 +34,9 @@ class OrderService {
     if (!cart || cart.items.length === 0) throw createError("Carrinho vazio.", 400);
 
     for (const item of cart.items) {
+      if (!item.product.isActive) {
+        throw createError(`Produto "${item.product.name}" não está mais disponível.`, 409);
+      }
       if (item.product.stock < item.quantity) {
         throw createError(`Estoque insuficiente para "${item.product.name}".`, 409);
       }

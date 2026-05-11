@@ -12,11 +12,24 @@ const routes = express.Router();
  *     tags: [Addresses]
  *     security:
  *       - BearerAuth: []
+ *     description: Retorna apenas endereços ativos (não soft-deletados).
  *     responses:
  *       200:
  *         description: Lista de endereços
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 addresses:
+ *                   type: array
+ *                   items:
+ *                     $ref: '#/components/schemas/AddressResponse'
  *       401:
  *         description: Não autenticado
+ *         content:
+ *           application/json:
+ *             schema: { $ref: '#/components/schemas/Error' }
  */
 routes.get("/", authToken, addressControllers.getAddresses.bind(addressControllers));
 
@@ -28,21 +41,38 @@ routes.get("/", authToken, addressControllers.getAddresses.bind(addressControlle
  *     tags: [Addresses]
  *     security:
  *       - BearerAuth: []
+ *     description: Usuário comum só vê seus próprios endereços ativos. ADMIN vê qualquer endereço (inclusive inativos).
  *     parameters:
  *       - in: path
  *         name: id
  *         required: true
- *         schema:
- *           type: string
- *           format: uuid
+ *         schema: { type: string, format: uuid }
  *         description: ID do endereço
  *     responses:
  *       200:
  *         description: Endereço encontrado
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 address:
+ *                   $ref: '#/components/schemas/AddressResponse'
  *       401:
  *         description: Não autenticado
+ *         content:
+ *           application/json:
+ *             schema: { $ref: '#/components/schemas/Error' }
+ *       403:
+ *         description: Endereço pertence a outro usuário
+ *         content:
+ *           application/json:
+ *             schema: { $ref: '#/components/schemas/Error' }
  *       404:
- *         description: Endereço não encontrado
+ *         description: Endereço não encontrado ou inativo
+ *         content:
+ *           application/json:
+ *             schema: { $ref: '#/components/schemas/Error' }
  */
 routes.get("/:id", authToken, addressControllers.getAddressById.bind(addressControllers));
 
@@ -89,10 +119,24 @@ routes.get("/:id", authToken, addressControllers.getAddressById.bind(addressCont
  *     responses:
  *       201:
  *         description: Endereço criado
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message: { type: string }
+ *                 address:
+ *                   $ref: '#/components/schemas/AddressResponse'
  *       400:
  *         description: Dados inválidos
+ *         content:
+ *           application/json:
+ *             schema: { $ref: '#/components/schemas/Error' }
  *       401:
  *         description: Não autenticado
+ *         content:
+ *           application/json:
+ *             schema: { $ref: '#/components/schemas/Error' }
  */
 routes.post("/", authToken, addressControllers.createAddress.bind(addressControllers));
 
@@ -104,13 +148,12 @@ routes.post("/", authToken, addressControllers.createAddress.bind(addressControl
  *     tags: [Addresses]
  *     security:
  *       - BearerAuth: []
+ *     description: Só funciona em endereços ativos do próprio usuário.
  *     parameters:
  *       - in: path
  *         name: id
  *         required: true
- *         schema:
- *           type: string
- *           format: uuid
+ *         schema: { type: string, format: uuid }
  *         description: ID do endereço
  *     requestBody:
  *       required: true
@@ -119,31 +162,43 @@ routes.post("/", authToken, addressControllers.createAddress.bind(addressControl
  *           schema:
  *             type: object
  *             properties:
- *               street:
- *                 type: string
- *                 maxLength: 100
- *               number:
- *                 type: integer
- *                 minimum: 1
- *               complement:
- *                 type: string
- *                 maxLength: 100
- *               city:
- *                 type: string
- *                 maxLength: 100
- *               state:
- *                 type: string
- *                 pattern: "^[A-Z]{2}$"
- *               zipCode:
- *                 type: string
- *                 pattern: "^\\d{5}-\\d{3}$"
+ *               street: { type: string, maxLength: 100 }
+ *               number: { type: integer, minimum: 1 }
+ *               complement: { type: string, maxLength: 100 }
+ *               city: { type: string, maxLength: 100 }
+ *               state: { type: string, pattern: "^[A-Z]{2}$" }
+ *               zipCode: { type: string, pattern: "^\\d{5}-\\d{3}$" }
  *     responses:
  *       200:
  *         description: Endereço atualizado
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message: { type: string }
+ *                 address:
+ *                   $ref: '#/components/schemas/AddressResponse'
+ *       400:
+ *         description: Dados inválidos
+ *         content:
+ *           application/json:
+ *             schema: { $ref: '#/components/schemas/Error' }
  *       401:
  *         description: Não autenticado
+ *         content:
+ *           application/json:
+ *             schema: { $ref: '#/components/schemas/Error' }
+ *       403:
+ *         description: Endereço pertence a outro usuário
+ *         content:
+ *           application/json:
+ *             schema: { $ref: '#/components/schemas/Error' }
  *       404:
- *         description: Endereço não encontrado
+ *         description: Endereço não encontrado ou inativo
+ *         content:
+ *           application/json:
+ *             schema: { $ref: '#/components/schemas/Error' }
  */
 routes.patch("/:id", authToken, addressControllers.updateAddress.bind(addressControllers));
 
@@ -151,25 +206,44 @@ routes.patch("/:id", authToken, addressControllers.updateAddress.bind(addressCon
  * @swagger
  * /addresses/{id}:
  *   delete:
- *     summary: Deletar endereço
+ *     summary: Remover endereço
  *     tags: [Addresses]
  *     security:
  *       - BearerAuth: []
+ *     description: >
+ *       Remove o endereço do usuário autenticado.
+ *       **Estratégia de deleção:**
+ *       - Se o endereço não tem pedidos vinculados → delete físico (`softDeleted: false`).
+ *       - Se tem pedidos vinculados → soft delete (`isActive=false`, `softDeleted: true`). O endereço
+ *         deixa de aparecer na listagem mas os pedidos históricos são preservados.
  *     parameters:
  *       - in: path
  *         name: id
  *         required: true
- *         schema:
- *           type: string
- *           format: uuid
+ *         schema: { type: string, format: uuid }
  *         description: ID do endereço
  *     responses:
  *       200:
- *         description: Endereço deletado
+ *         description: Endereço removido ou desativado
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/DeleteAddressResponse'
  *       401:
  *         description: Não autenticado
+ *         content:
+ *           application/json:
+ *             schema: { $ref: '#/components/schemas/Error' }
+ *       403:
+ *         description: Endereço pertence a outro usuário
+ *         content:
+ *           application/json:
+ *             schema: { $ref: '#/components/schemas/Error' }
  *       404:
- *         description: Endereço não encontrado
+ *         description: Endereço não encontrado ou já removido
+ *         content:
+ *           application/json:
+ *             schema: { $ref: '#/components/schemas/Error' }
  */
 routes.delete("/:id", authToken, addressControllers.deleteAddress.bind(addressControllers));
 

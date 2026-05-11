@@ -11,32 +11,31 @@ const routes = express.Router();
  *   get:
  *     summary: Listar produtos
  *     tags: [Products]
+ *     description: Retorna apenas produtos ativos (`isActive=true`). Suporta filtro por categoria e busca textual.
  *     parameters:
  *       - in: query
  *         name: category
- *         schema:
- *           type: string
+ *         schema: { type: string }
  *         description: Slug da categoria para filtrar
+ *         example: headphones
  *       - in: query
  *         name: search
- *         schema:
- *           type: string
- *         description: Termo de busca (nome do produto)
+ *         schema: { type: string }
+ *         description: Busca por nome ou marca (case-insensitive)
+ *         example: Sony
  *       - in: query
  *         name: page
- *         schema:
- *           type: integer
- *           minimum: 1
- *           default: 1
+ *         schema: { type: integer, minimum: 1, default: 1 }
  *       - in: query
  *         name: limit
- *         schema:
- *           type: integer
- *           minimum: 1
- *           default: 20
+ *         schema: { type: integer, minimum: 1, maximum: 100, default: 20 }
  *     responses:
  *       200:
- *         description: Lista de produtos
+ *         description: Lista paginada de produtos
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ProductListResponse'
  */
 routes.get("/", productsControllers.getProducts.bind(productsControllers));
 
@@ -46,21 +45,33 @@ routes.get("/", productsControllers.getProducts.bind(productsControllers));
  *   get:
  *     summary: Buscar produto por ID
  *     tags: [Products]
+ *     description: Retorna 404 se o produto estiver inativo.
  *     parameters:
  *       - in: path
  *         name: id
  *         required: true
- *         schema:
- *           type: string
- *           format: uuid
+ *         schema: { type: string, format: uuid }
  *         description: ID do produto
  *     responses:
  *       200:
- *         description: Produto encontrado
+ *         description: Produto encontrado (com galeria de imagens)
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 product:
+ *                   $ref: '#/components/schemas/ProductWithImages'
  *       400:
  *         description: ID inválido
+ *         content:
+ *           application/json:
+ *             schema: { $ref: '#/components/schemas/Error' }
  *       404:
- *         description: Produto não encontrado
+ *         description: Produto não encontrado ou inativo
+ *         content:
+ *           application/json:
+ *             schema: { $ref: '#/components/schemas/Error' }
  */
 routes.get("/:id", productsControllers.getProductById.bind(productsControllers));
 
@@ -84,7 +95,6 @@ routes.get("/:id", productsControllers.getProductById.bind(productsControllers))
  *               categoryId:
  *                 type: string
  *                 format: uuid
- *                 example: 550e8400-e29b-41d4-a716-446655440000
  *               name:
  *                 type: string
  *                 minLength: 3
@@ -115,12 +125,39 @@ routes.get("/:id", productsControllers.getProductById.bind(productsControllers))
  *     responses:
  *       201:
  *         description: Produto criado
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message: { type: string }
+ *                 product:
+ *                   $ref: '#/components/schemas/ProductResponse'
  *       400:
  *         description: Dados inválidos
+ *         content:
+ *           application/json:
+ *             schema: { $ref: '#/components/schemas/Error' }
  *       401:
  *         description: Não autenticado
+ *         content:
+ *           application/json:
+ *             schema: { $ref: '#/components/schemas/Error' }
  *       403:
  *         description: Acesso negado
+ *         content:
+ *           application/json:
+ *             schema: { $ref: '#/components/schemas/Error' }
+ *       404:
+ *         description: Categoria não encontrada
+ *         content:
+ *           application/json:
+ *             schema: { $ref: '#/components/schemas/Error' }
+ *       409:
+ *         description: Produto com mesmo nome já existe
+ *         content:
+ *           application/json:
+ *             schema: { $ref: '#/components/schemas/Error' }
  */
 routes.post("/", authToken, authAdminOnly, productsControllers.createProduct.bind(productsControllers));
 
@@ -132,14 +169,12 @@ routes.post("/", authToken, authAdminOnly, productsControllers.createProduct.bin
  *     tags: [Products]
  *     security:
  *       - BearerAuth: []
- *     description: Requer role ADMIN. Campos são opcionais (partial update).
+ *     description: Requer role ADMIN. Todos os campos são opcionais (partial update).
  *     parameters:
  *       - in: path
  *         name: id
  *         required: true
- *         schema:
- *           type: string
- *           format: uuid
+ *         schema: { type: string, format: uuid }
  *         description: ID do produto
  *     requestBody:
  *       required: true
@@ -148,39 +183,49 @@ routes.post("/", authToken, authAdminOnly, productsControllers.createProduct.bin
  *           schema:
  *             type: object
  *             properties:
- *               categoryId:
- *                 type: string
- *                 format: uuid
- *               name:
- *                 type: string
- *                 minLength: 3
- *                 maxLength: 100
- *               mark:
- *                 type: string
- *                 minLength: 2
- *                 maxLength: 100
- *               description:
- *                 type: string
- *                 minLength: 10
- *               price:
- *                 type: number
- *                 format: double
- *                 minimum: 0.01
- *               stock:
- *                 type: integer
- *                 minimum: 0
- *               imageUrl:
- *                 type: string
- *                 format: uri
+ *               categoryId: { type: string, format: uuid }
+ *               name: { type: string, minLength: 3, maxLength: 100 }
+ *               mark: { type: string, minLength: 2, maxLength: 100 }
+ *               description: { type: string, minLength: 10 }
+ *               price: { type: number, format: double, minimum: 0.01 }
+ *               stock: { type: integer, minimum: 0 }
+ *               imageUrl: { type: string, format: uri }
  *     responses:
  *       200:
  *         description: Produto atualizado
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message: { type: string }
+ *                 product:
+ *                   $ref: '#/components/schemas/ProductResponse'
+ *       400:
+ *         description: Dados inválidos
+ *         content:
+ *           application/json:
+ *             schema: { $ref: '#/components/schemas/Error' }
  *       401:
  *         description: Não autenticado
+ *         content:
+ *           application/json:
+ *             schema: { $ref: '#/components/schemas/Error' }
  *       403:
  *         description: Acesso negado
+ *         content:
+ *           application/json:
+ *             schema: { $ref: '#/components/schemas/Error' }
  *       404:
- *         description: Produto não encontrado
+ *         description: Produto ou categoria não encontrada
+ *         content:
+ *           application/json:
+ *             schema: { $ref: '#/components/schemas/Error' }
+ *       409:
+ *         description: Nome já em uso por outro produto
+ *         content:
+ *           application/json:
+ *             schema: { $ref: '#/components/schemas/Error' }
  */
 routes.patch("/update/:id", authToken, authAdminOnly, productsControllers.updateProduct.bind(productsControllers));
 
@@ -192,24 +237,45 @@ routes.patch("/update/:id", authToken, authAdminOnly, productsControllers.update
  *     tags: [Products]
  *     security:
  *       - BearerAuth: []
- *     description: Requer role ADMIN
+ *     description: >
+ *       Requer role ADMIN.
+ *       **Estratégia de deleção:**
+ *       - Se o produto não tem `OrderItem` vinculado → delete físico com cascade em `ProductImage` (`softDeleted: false`).
+ *       - Se tem `OrderItem` → soft delete (`isActive=false`, `softDeleted: true`) + remove o produto de todos os carrinhos.
+ *       Produto desativado não aparece no catálogo nem pode ser adicionado ao carrinho.
  *     parameters:
  *       - in: path
  *         name: id
  *         required: true
- *         schema:
- *           type: string
- *           format: uuid
+ *         schema: { type: string, format: uuid }
  *         description: ID do produto
  *     responses:
  *       200:
- *         description: Produto deletado
+ *         description: Produto deletado ou desativado
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/DeleteProductResponse'
  *       401:
  *         description: Não autenticado
+ *         content:
+ *           application/json:
+ *             schema: { $ref: '#/components/schemas/Error' }
  *       403:
  *         description: Acesso negado
+ *         content:
+ *           application/json:
+ *             schema: { $ref: '#/components/schemas/Error' }
  *       404:
  *         description: Produto não encontrado
+ *         content:
+ *           application/json:
+ *             schema: { $ref: '#/components/schemas/Error' }
+ *       409:
+ *         description: Produto já foi removido
+ *         content:
+ *           application/json:
+ *             schema: { $ref: '#/components/schemas/Error' }
  */
 routes.delete("/:id", authToken, authAdminOnly, productsControllers.deleteProduct.bind(productsControllers));
 
@@ -223,15 +289,30 @@ routes.delete("/:id", authToken, authAdminOnly, productsControllers.deleteProduc
  *       - in: path
  *         name: productId
  *         required: true
- *         schema:
- *           type: string
- *           format: uuid
+ *         schema: { type: string, format: uuid }
  *         description: ID do produto
  *     responses:
  *       200:
  *         description: Lista de imagens
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 images:
+ *                   type: array
+ *                   items:
+ *                     $ref: '#/components/schemas/ProductImageResponse'
+ *       400:
+ *         description: ID inválido
+ *         content:
+ *           application/json:
+ *             schema: { $ref: '#/components/schemas/Error' }
  *       404:
  *         description: Produto não encontrado
+ *         content:
+ *           application/json:
+ *             schema: { $ref: '#/components/schemas/Error' }
  */
 routes.get("/:productId/images", productImagesControllers.getImages.bind(productImagesControllers));
 
@@ -248,9 +329,7 @@ routes.get("/:productId/images", productImagesControllers.getImages.bind(product
  *       - in: path
  *         name: productId
  *         required: true
- *         schema:
- *           type: string
- *           format: uuid
+ *         schema: { type: string, format: uuid }
  *         description: ID do produto
  *     requestBody:
  *       required: true
@@ -267,12 +346,34 @@ routes.get("/:productId/images", productImagesControllers.getImages.bind(product
  *     responses:
  *       201:
  *         description: Imagem adicionada
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message: { type: string }
+ *                 image:
+ *                   $ref: '#/components/schemas/ProductImageResponse'
+ *       400:
+ *         description: URL inválida
+ *         content:
+ *           application/json:
+ *             schema: { $ref: '#/components/schemas/Error' }
  *       401:
  *         description: Não autenticado
+ *         content:
+ *           application/json:
+ *             schema: { $ref: '#/components/schemas/Error' }
  *       403:
  *         description: Acesso negado
+ *         content:
+ *           application/json:
+ *             schema: { $ref: '#/components/schemas/Error' }
  *       404:
  *         description: Produto não encontrado
+ *         content:
+ *           application/json:
+ *             schema: { $ref: '#/components/schemas/Error' }
  */
 routes.post("/:productId/images", authToken, authAdminOnly, productImagesControllers.addImage.bind(productImagesControllers));
 
@@ -289,26 +390,39 @@ routes.post("/:productId/images", authToken, authAdminOnly, productImagesControl
  *       - in: path
  *         name: productId
  *         required: true
- *         schema:
- *           type: string
- *           format: uuid
+ *         schema: { type: string, format: uuid }
  *         description: ID do produto
  *       - in: path
  *         name: imageId
  *         required: true
- *         schema:
- *           type: string
- *           format: uuid
+ *         schema: { type: string, format: uuid }
  *         description: ID da imagem
  *     responses:
  *       200:
  *         description: Imagem removida
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message: { type: string }
+ *                 image:
+ *                   $ref: '#/components/schemas/ProductImageResponse'
  *       401:
  *         description: Não autenticado
+ *         content:
+ *           application/json:
+ *             schema: { $ref: '#/components/schemas/Error' }
  *       403:
  *         description: Acesso negado
+ *         content:
+ *           application/json:
+ *             schema: { $ref: '#/components/schemas/Error' }
  *       404:
  *         description: Imagem não encontrada
+ *         content:
+ *           application/json:
+ *             schema: { $ref: '#/components/schemas/Error' }
  */
 routes.delete("/:productId/images/:imageId", authToken, authAdminOnly, productImagesControllers.removeImage.bind(productImagesControllers));
 

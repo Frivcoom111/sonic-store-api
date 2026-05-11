@@ -14,7 +14,7 @@ export const authToken: RequestHandler = async (req: Request, res: Response, nex
       return next(createError("Token não fornecido.", 401));
     }
 
-    const token = headerAuthorization.split(" ")[1];
+    const token = headerAuthorization.split(" ")[1] as string;
 
     const decoded = jwt.verify(token, JWT_SECRET) as jwt.JwtPayload;
 
