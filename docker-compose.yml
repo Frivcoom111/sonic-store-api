@@ -1,5 +1,6 @@
 services:
-  api:
+  
+  backend:
     build: .
     command: npm run start:dev
     ports:
@@ -11,23 +12,34 @@ services:
     env_file:
       - .env
     depends_on:
-      db: 
+      redis: 5s
+      database: 
         condition: service_healthy
-  db:
+      
+  database:
     image: postgres:15
     ports:
       - "5432:5432"
     environment:
-      - POSTGRES_USER=${POSTGRES_USER:-sonic}
-      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-sonic123}
-      - POSTGRES_DB=${POSTGRES_DB:-sonic_store}
+      - POSTGRES_USER=${POSTGRES_USER:-root}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-root123}
+      - POSTGRES_DB=${POSTGRES_DB:-template_api}
     volumes:
       - dados_db:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U sonic -d sonic_store"]
+      test: ["CMD-SHELL", "pg_isready -U root -d template_api"]
       interval: 5s
       timeout: 5s
       retries: 5
+
+  regis: 
+    image: redis:8.8-m03-alpine
+    ports:
+      - "6379:6379"
+    environment:
+      - REDIS_PASSWORD=${REDIS_PASSWORD:-root123}
+    volumes:
+      -dados_db:/var/lib/redis/data
 
 volumes:
   dados_db:
