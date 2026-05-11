@@ -1,4 +1,4 @@
-# Estratégia de Deleção — Sonic Store API
+# Estratégia de Deleção — API Template
 
 ## Princípio Geral
 
