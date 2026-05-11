@@ -52,7 +52,7 @@ class CartService {
   async addItem(userId: string, productId: string, quantity: number): Promise<CartResponse> {
     const product = await prisma.product.findUnique({ where: { id: productId } });
 
-    if (!product) throw createError("Produto não encontrado.", 404);
+    if (!product || !product.isActive) throw createError("Produto não encontrado.", 404);
     if (quantity <= 0) throw createError("Quantidade inválida.", 400);
     if (product.stock < quantity) throw createError("Estoque insuficiente.", 409);
 
@@ -86,7 +86,7 @@ class CartService {
 
     const product = await prisma.product.findUnique({ where: { id: productId } });
 
-    if (!product) throw createError("Produto não encontrado.", 404);
+    if (!product || !product.isActive) throw createError("Produto não encontrado.", 404);
     if (quantity <= 0) throw createError("Quantidade inválida.", 400);
     if (product.stock < quantity) throw createError("Estoque insuficiente.", 409);
 

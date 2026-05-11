@@ -105,9 +105,14 @@ class AddressControllers {
         return;
       }
 
-      await addressServices.deleteAddress(validation.data.id, id);
+      const result = await addressServices.deleteAddress(validation.data.id, id);
 
-      res.status(200).json({ message: "Endereço removido com sucesso." });
+      res.status(200).json({
+        message: result.softDeleted
+          ? "Endereço desativado. Pedidos vinculados foram preservados."
+          : "Endereço removido com sucesso.",
+        softDeleted: result.softDeleted,
+      });
     } catch (error) {
       next(error);
     }

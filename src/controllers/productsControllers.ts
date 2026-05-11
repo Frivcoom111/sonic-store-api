@@ -4,7 +4,6 @@ import { productSchema, updateProductSchema } from "../validators/productsValida
 import { idParamsSchema } from "../validators/globalValidators";
 import type {
   CreateProductDTO,
-  ProductDeleteResponse,
   ProductListResponse,
   ProductResponse,
   UpdateProductDTO,
@@ -69,9 +68,16 @@ class ProductsControllers {
         return;
       }
 
-      const product: ProductDeleteResponse = await productsServices.delete(validation.data.id);
+      const result = await productsServices.delete(validation.data.id);
+      const { softDeleted, ...product } = result;
 
-      res.status(200).json({ message: "Produto deletado com sucesso.", product });
+      res.status(200).json({
+        message: softDeleted
+          ? "Produto desativado. Pedidos históricos foram preservados."
+          : "Produto deletado com sucesso.",
+        softDeleted,
+        product,
+      });
     } catch (error) {
       next(error);
     }

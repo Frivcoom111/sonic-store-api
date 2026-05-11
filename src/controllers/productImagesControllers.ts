@@ -18,9 +18,9 @@ class ProductImagesControllers {
         return;
       }
 
-      const images: { images: ProductImageResponse[] } = await productImagesServices.getByProduct(validation.data.id);
+      const images = await productImagesServices.getByProduct(validation.data.id);
 
-      res.status(200).json({ images });
+      res.status(200).json(images);
     } catch (error) {
       next(error);
     }

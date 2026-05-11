@@ -13,13 +13,30 @@ const routes = express.Router();
  *     security:
  *       - BearerAuth: []
  *     description: Requer role ADMIN
+ *     parameters:
+ *       - in: query
+ *         name: page
+ *         schema: { type: integer, minimum: 1, default: 1 }
+ *       - in: query
+ *         name: limit
+ *         schema: { type: integer, minimum: 1, maximum: 100, default: 20 }
  *     responses:
  *       200:
- *         description: Lista de usuários
+ *         description: Lista paginada de usuários
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/UserListResponse'
  *       401:
  *         description: Não autenticado
+ *         content:
+ *           application/json:
+ *             schema: { $ref: '#/components/schemas/Error' }
  *       403:
  *         description: Acesso negado
+ *         content:
+ *           application/json:
+ *             schema: { $ref: '#/components/schemas/Error' }
  */
 routes.get("/", authToken, authAdminOnly, userControllers.getUsers.bind(userControllers));
 
@@ -60,14 +77,34 @@ routes.get("/", authToken, authAdminOnly, userControllers.getUsers.bind(userCont
  *     responses:
  *       201:
  *         description: Usuário criado
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message: { type: string }
+ *                 userCreated:
+ *                   $ref: '#/components/schemas/UserResponse'
  *       400:
  *         description: Dados inválidos
+ *         content:
+ *           application/json:
+ *             schema: { $ref: '#/components/schemas/Error' }
  *       401:
  *         description: Não autenticado
+ *         content:
+ *           application/json:
+ *             schema: { $ref: '#/components/schemas/Error' }
  *       403:
  *         description: Acesso negado
+ *         content:
+ *           application/json:
+ *             schema: { $ref: '#/components/schemas/Error' }
  *       409:
  *         description: Email já cadastrado
+ *         content:
+ *           application/json:
+ *             schema: { $ref: '#/components/schemas/Error' }
  */
 routes.post("/", authToken, authAdminOnly, userControllers.createUser.bind(userControllers));
 
@@ -96,10 +133,29 @@ routes.post("/", authToken, authAdminOnly, userControllers.createUser.bind(userC
  *     responses:
  *       200:
  *         description: Perfil atualizado
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message: { type: string }
+ *                 updatedUser:
+ *                   $ref: '#/components/schemas/UserResponse'
  *       400:
  *         description: Dados inválidos
+ *         content:
+ *           application/json:
+ *             schema: { $ref: '#/components/schemas/Error' }
  *       401:
  *         description: Não autenticado
+ *         content:
+ *           application/json:
+ *             schema: { $ref: '#/components/schemas/Error' }
+ *       409:
+ *         description: Email já cadastrado
+ *         content:
+ *           application/json:
+ *             schema: { $ref: '#/components/schemas/Error' }
  */
 routes.patch("/update/me", authToken, userControllers.updateUser.bind(userControllers));
 
@@ -130,10 +186,24 @@ routes.patch("/update/me", authToken, userControllers.updateUser.bind(userContro
  *     responses:
  *       200:
  *         description: Senha alterada
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message: { type: string }
+ *                 updatedUser:
+ *                   $ref: '#/components/schemas/UserResponse'
  *       400:
  *         description: Dados inválidos
+ *         content:
+ *           application/json:
+ *             schema: { $ref: '#/components/schemas/Error' }
  *       401:
  *         description: Senha atual incorreta ou token inválido
+ *         content:
+ *           application/json:
+ *             schema: { $ref: '#/components/schemas/Error' }
  */
 routes.patch("/update/password", authToken, userControllers.updateUserPassword.bind(userControllers));
 
@@ -150,9 +220,7 @@ routes.patch("/update/password", authToken, userControllers.updateUserPassword.b
  *       - in: path
  *         name: id
  *         required: true
- *         schema:
- *           type: string
- *           format: uuid
+ *         schema: { type: string, format: uuid }
  *         description: ID do usuário
  *     requestBody:
  *       required: true
@@ -169,12 +237,34 @@ routes.patch("/update/password", authToken, userControllers.updateUserPassword.b
  *     responses:
  *       200:
  *         description: Role atualizado
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message: { type: string }
+ *                 updatedUser:
+ *                   $ref: '#/components/schemas/UserResponse'
  *       401:
  *         description: Não autenticado
+ *         content:
+ *           application/json:
+ *             schema: { $ref: '#/components/schemas/Error' }
  *       403:
  *         description: Acesso negado
+ *         content:
+ *           application/json:
+ *             schema: { $ref: '#/components/schemas/Error' }
  *       404:
  *         description: Usuário não encontrado
+ *         content:
+ *           application/json:
+ *             schema: { $ref: '#/components/schemas/Error' }
+ *       409:
+ *         description: Usuário já possui esse role
+ *         content:
+ *           application/json:
+ *             schema: { $ref: '#/components/schemas/Error' }
  */
 routes.patch("/update/:id/role", authToken, authAdminOnly, userControllers.updateUserRole.bind(userControllers));
 
@@ -186,24 +276,60 @@ routes.patch("/update/:id/role", authToken, authAdminOnly, userControllers.updat
  *     tags: [Users]
  *     security:
  *       - BearerAuth: []
- *     description: Requer role ADMIN
+ *     description: Requer role ADMIN. Soft delete — usuário não é deletado fisicamente.
  *     parameters:
  *       - in: path
  *         name: id
  *         required: true
- *         schema:
- *           type: string
- *           format: uuid
+ *         schema: { type: string, format: uuid }
  *         description: ID do usuário
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [isActive]
+ *             properties:
+ *               isActive:
+ *                 type: boolean
+ *                 example: false
  *     responses:
  *       200:
  *         description: Status do usuário alternado
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message: { type: string }
+ *                 userToggle:
+ *                   $ref: '#/components/schemas/UserResponse'
+ *       400:
+ *         description: isActive não é boolean
+ *         content:
+ *           application/json:
+ *             schema: { $ref: '#/components/schemas/Error' }
  *       401:
  *         description: Não autenticado
+ *         content:
+ *           application/json:
+ *             schema: { $ref: '#/components/schemas/Error' }
  *       403:
  *         description: Acesso negado
+ *         content:
+ *           application/json:
+ *             schema: { $ref: '#/components/schemas/Error' }
  *       404:
  *         description: Usuário não encontrado
+ *         content:
+ *           application/json:
+ *             schema: { $ref: '#/components/schemas/Error' }
+ *       409:
+ *         description: Usuário já está no estado solicitado
+ *         content:
+ *           application/json:
+ *             schema: { $ref: '#/components/schemas/Error' }
  */
 routes.patch("/toggle/:id", authToken, authAdminOnly, userControllers.toggle.bind(userControllers));
 

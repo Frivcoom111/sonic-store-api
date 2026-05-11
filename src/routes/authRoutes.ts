@@ -35,10 +35,24 @@ const routes = express.Router();
  *     responses:
  *       201:
  *         description: Usuário registrado com sucesso
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message: { type: string }
+ *                 userCreated:
+ *                   $ref: '#/components/schemas/UserResponse'
  *       400:
  *         description: Dados inválidos
+ *         content:
+ *           application/json:
+ *             schema: { $ref: '#/components/schemas/Error' }
  *       409:
  *         description: Email já cadastrado
+ *         content:
+ *           application/json:
+ *             schema: { $ref: '#/components/schemas/Error' }
  */
 routes.post("/register", authControllers.register.bind(authControllers));
 
@@ -65,11 +79,28 @@ routes.post("/register", authControllers.register.bind(authControllers));
  *                 example: Senha123
  *     responses:
  *       200:
- *         description: Login realizado — retorna token JWT
+ *         description: Login realizado com sucesso
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message: { type: string }
+ *                 token:
+ *                   type: string
+ *                   description: JWT para usar no header Authorization
+ *                 user:
+ *                   $ref: '#/components/schemas/UserResponse'
  *       400:
  *         description: Dados inválidos
+ *         content:
+ *           application/json:
+ *             schema: { $ref: '#/components/schemas/Error' }
  *       401:
  *         description: Email ou senha incorretos
+ *         content:
+ *           application/json:
+ *             schema: { $ref: '#/components/schemas/Error' }
  */
 routes.post("/login", authControllers.login.bind(authControllers));
 
@@ -83,9 +114,19 @@ routes.post("/login", authControllers.login.bind(authControllers));
  *       - BearerAuth: []
  *     responses:
  *       200:
- *         description: Dados do usuário retornados
+ *         description: Dados do usuário autenticado
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 user:
+ *                   $ref: '#/components/schemas/UserResponse'
  *       401:
  *         description: Token ausente ou inválido
+ *         content:
+ *           application/json:
+ *             schema: { $ref: '#/components/schemas/Error' }
  */
 routes.get("/me", authToken, authControllers.getUser.bind(authControllers));
 
