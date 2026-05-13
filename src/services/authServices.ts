@@ -89,7 +89,7 @@ class AuthService {
     }
   }
 
-  async getUser(id: string): Promise<UserResponse> {
+  async getUser(id: string): Promise<UserResponse> { 
     if (!id) throw createError("ID inválido.", 400);
 
     const user = await prisma.user.findUnique({
