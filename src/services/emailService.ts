@@ -1,5 +1,6 @@
 import { IUser } from "../interfaces/user.interface";
 import transporter from "../lib/mailer";
+import { getRequiredEnv } from "../utils/getRequiredEnv";
 import prisma from "../lib/prisma";
 import redis from "../lib/redis";
 import { createError } from "../utils/createError";
@@ -24,7 +25,7 @@ class EmailService {
 
         const verification = await redis.get(user.email);
 
-        if (!verification) {
+        if (verification) {
             throw createError("E-mail de verificação já encaminhado.", 400);
         }
 
@@ -34,8 +35,18 @@ class EmailService {
         // Armazena no redis por 5 minutos
         await redis.set(user.email, code, "EX", 300);
 
-        transporter.sendMail({
-            
-        })
+        await transporter.sendMail({
+            from: `"No Reply" <${getRequiredEnv("MAIL_USER")}>`,
+            to: user.email,
+            subject: "Verificação de e-mail",
+            html: `
+                <h2>Olá, ${user.name}!</h2>
+                <p>Seu código de verificação é:</p>
+                <h1 style="letter-spacing: 8px;">${code}</h1>
+                <p>Este código expira em <strong>5 minutos</strong>.</p>
+            `
+        });
     }
 }
+
+export default new EmailService;
