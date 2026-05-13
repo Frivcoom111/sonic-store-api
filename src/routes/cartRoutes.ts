@@ -12,7 +12,7 @@ const routes = express.Router();
  *     tags: [Cart]
  *     security:
  *       - BearerAuth: []
- *     description: Retorna o carrinho com itens e total calculado. Se o carrinho não existir, retorna `id: null` e lista vazia.
+ *     description: Retorna o carrinho com itens e total calculado. Se o carrinho não existir, retorna id null e lista vazia.
  *     responses:
  *       200:
  *         description: Carrinho retornado (vazio ou com itens)
@@ -27,7 +27,8 @@ const routes = express.Router();
  *         description: Não autenticado
  *         content:
  *           application/json:
- *             schema: { $ref: '#/components/schemas/Error' }
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
  */
 routes.get("/", authToken, cartControllers.getCart.bind(cartControllers));
 
@@ -63,29 +64,34 @@ routes.get("/", authToken, cartControllers.getCart.bind(cartControllers));
  *             schema:
  *               type: object
  *               properties:
- *                 message: { type: string }
+ *                 message:
+ *                   type: string
  *                 cart:
  *                   $ref: '#/components/schemas/CartResponse'
  *       400:
  *         description: Dados inválidos ou quantidade zero
  *         content:
  *           application/json:
- *             schema: { $ref: '#/components/schemas/Error' }
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
  *       401:
  *         description: Não autenticado
  *         content:
  *           application/json:
- *             schema: { $ref: '#/components/schemas/Error' }
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
  *       404:
  *         description: Produto não encontrado ou inativo
  *         content:
  *           application/json:
- *             schema: { $ref: '#/components/schemas/Error' }
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
  *       409:
  *         description: Estoque insuficiente ou quantidade igual à atual
  *         content:
  *           application/json:
- *             schema: { $ref: '#/components/schemas/Error' }
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
  */
 routes.post("/", authToken, cartControllers.addItem.bind(cartControllers));
 
@@ -101,7 +107,9 @@ routes.post("/", authToken, cartControllers.addItem.bind(cartControllers));
  *       - in: path
  *         name: productId
  *         required: true
- *         schema: { type: string, format: uuid }
+ *         schema:
+ *           type: string
+ *           format: uuid
  *         description: ID do produto no carrinho
  *     requestBody:
  *       required: true
@@ -123,29 +131,34 @@ routes.post("/", authToken, cartControllers.addItem.bind(cartControllers));
  *             schema:
  *               type: object
  *               properties:
- *                 message: { type: string }
+ *                 message:
+ *                   type: string
  *                 cart:
  *                   $ref: '#/components/schemas/CartResponse'
  *       400:
  *         description: Dados inválidos
  *         content:
  *           application/json:
- *             schema: { $ref: '#/components/schemas/Error' }
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
  *       401:
  *         description: Não autenticado
  *         content:
  *           application/json:
- *             schema: { $ref: '#/components/schemas/Error' }
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
  *       404:
  *         description: Carrinho, item ou produto não encontrado
  *         content:
  *           application/json:
- *             schema: { $ref: '#/components/schemas/Error' }
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
  *       409:
  *         description: Estoque insuficiente
  *         content:
  *           application/json:
- *             schema: { $ref: '#/components/schemas/Error' }
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
  */
 routes.patch("/:productId", authToken, cartControllers.updateItem.bind(cartControllers));
 
@@ -161,7 +174,9 @@ routes.patch("/:productId", authToken, cartControllers.updateItem.bind(cartContr
  *       - in: path
  *         name: productId
  *         required: true
- *         schema: { type: string, format: uuid }
+ *         schema:
+ *           type: string
+ *           format: uuid
  *         description: ID do produto a remover
  *     responses:
  *       200:
@@ -171,19 +186,22 @@ routes.patch("/:productId", authToken, cartControllers.updateItem.bind(cartContr
  *             schema:
  *               type: object
  *               properties:
- *                 message: { type: string }
+ *                 message:
+ *                   type: string
  *                 cart:
  *                   $ref: '#/components/schemas/CartResponse'
  *       401:
  *         description: Não autenticado
  *         content:
  *           application/json:
- *             schema: { $ref: '#/components/schemas/Error' }
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
  *       404:
  *         description: Item não encontrado no carrinho
  *         content:
  *           application/json:
- *             schema: { $ref: '#/components/schemas/Error' }
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
  */
 routes.delete("/:productId", authToken, cartControllers.removeItem.bind(cartControllers));
 
@@ -203,19 +221,22 @@ routes.delete("/:productId", authToken, cartControllers.removeItem.bind(cartCont
  *             schema:
  *               type: object
  *               properties:
- *                 message: { type: string }
+ *                 message:
+ *                   type: string
  *                 cart:
  *                   $ref: '#/components/schemas/CartResponse'
  *       401:
  *         description: Não autenticado
  *         content:
  *           application/json:
- *             schema: { $ref: '#/components/schemas/Error' }
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
  *       404:
  *         description: Carrinho não encontrado
  *         content:
  *           application/json:
- *             schema: { $ref: '#/components/schemas/Error' }
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
  */
 routes.delete("/", authToken, cartControllers.clearCart.bind(cartControllers));
 

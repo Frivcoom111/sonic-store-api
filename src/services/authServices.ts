@@ -10,6 +10,8 @@ import type {
   RegisterDTO,
 } from "../interfaces/auth.interface";
 import type { UserResponse } from "../interfaces/user.interface";
+import { JwtPayload } from "jsonwebtoken";
+import redis from "../lib/redis";
 
 class AuthService {
   async register({ name, email, password }: RegisterDTO): Promise<UserResponse> {
@@ -75,6 +77,16 @@ class AuthService {
         isActive: user.isActive,
       },
     };
+  }
+
+  async logout(token: string, exp: number): Promise<void> {
+    if (!exp) throw createError("Token sem expiração definida.", 400);
+
+    const tokenExpiration: number = exp - Math.floor(Date.now() / 1000);
+
+    if (tokenExpiration > 0) {
+      await redis.set(String(token), "blacklisted", "EX", tokenExpiration);
+    }
   }
 
   async getUser(id: string): Promise<UserResponse> {

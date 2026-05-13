@@ -1,4 +1,4 @@
-import Redis from "ioredis";
+import Redis from "ioredis"
 import { getRequiredEnv } from "../utils/getRequiredEnv";
 
 const redis = new Redis({

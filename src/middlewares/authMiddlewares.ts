@@ -3,18 +3,23 @@ import jwt from "jsonwebtoken";
 import { getRequiredEnv } from "../utils/getRequiredEnv";
 import { createError } from "../utils/createError";
 import prisma from "../lib/prisma";
+import redis from "../lib/redis";
 
 const JWT_SECRET = getRequiredEnv("JWT_SECRET");
 
 export const authToken: RequestHandler = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const headerAuthorization = req.headers.authorization;
+    const headerAuthorization = req.headers.authorization as string;
 
     if (!headerAuthorization || !headerAuthorization.startsWith("Bearer ")) {
       return next(createError("Token não fornecido.", 401));
     }
 
-    const token = headerAuthorization.split(" ")[1] as string;
+    const token = headerAuthorization?.split(" ")[1] as string;
+
+    const tokenBlacklist = await redis.get(token);
+
+    if (tokenBlacklist) return next(createError("Token inválido", 401));
 
     const decoded = jwt.verify(token, JWT_SECRET) as jwt.JwtPayload;
 
@@ -25,7 +30,7 @@ export const authToken: RequestHandler = async (req: Request, res: Response, nex
 
     if (!user || !user.isActive) return next(createError("Usuário desativado, acesso negado.", 401));
 
-    req.user = { id: decoded.id, role: user.role, isActive: user.isActive };
+    req.user = { id: decoded.id, role: user.role, isActive: user.isActive, exp: decoded.exp };
 
     next();
   } catch (error) {

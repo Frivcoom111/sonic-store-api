@@ -13,7 +13,8 @@ services:
       - .env
     depends_on:
       redis:
-      database: 
+        condition: service_started
+      database:
         condition: service_healthy
       
   database:
@@ -32,12 +33,11 @@ services:
       timeout: 5s
       retries: 5
 
-  redis: 
+  redis:
     image: redis:7-alpine
     ports:
       - "6379:6379"
-    environment:
-      - REDIS_PASSWORD=${REDIS_PASSWORD:-root123}
+    command: redis-server --requirepass ${REDIS_PASSWORD:-root123}
     volumes:
       - dados_redis:/var/lib/redis/data
 

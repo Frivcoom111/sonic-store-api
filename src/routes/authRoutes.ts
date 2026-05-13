@@ -40,19 +40,22 @@ const routes = express.Router();
  *             schema:
  *               type: object
  *               properties:
- *                 message: { type: string }
+ *                 message:
+ *                   type: string
  *                 userCreated:
  *                   $ref: '#/components/schemas/UserResponse'
  *       400:
  *         description: Dados inválidos
  *         content:
  *           application/json:
- *             schema: { $ref: '#/components/schemas/Error' }
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
  *       409:
  *         description: Email já cadastrado
  *         content:
  *           application/json:
- *             schema: { $ref: '#/components/schemas/Error' }
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
  */
 routes.post("/register", authControllers.register.bind(authControllers));
 
@@ -85,7 +88,8 @@ routes.post("/register", authControllers.register.bind(authControllers));
  *             schema:
  *               type: object
  *               properties:
- *                 message: { type: string }
+ *                 message:
+ *                   type: string
  *                 token:
  *                   type: string
  *                   description: JWT para usar no header Authorization
@@ -95,14 +99,43 @@ routes.post("/register", authControllers.register.bind(authControllers));
  *         description: Dados inválidos
  *         content:
  *           application/json:
- *             schema: { $ref: '#/components/schemas/Error' }
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
  *       401:
  *         description: Email ou senha incorretos
  *         content:
  *           application/json:
- *             schema: { $ref: '#/components/schemas/Error' }
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
  */
 routes.post("/login", authControllers.login.bind(authControllers));
+
+/**
+ * @swagger
+ * /auth/logout:
+ *   post:
+ *     summary: Logout e invalidação do token JWT
+ *     tags: [Auth]
+ *     security:
+ *       - BearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Logout realizado com sucesso
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *       401:
+ *         description: Token ausente ou inválido
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
+ */
+routes.post("/logout", authToken, authControllers.logout.bind(authControllers));
 
 /**
  * @swagger
@@ -126,7 +159,8 @@ routes.post("/login", authControllers.login.bind(authControllers));
  *         description: Token ausente ou inválido
  *         content:
  *           application/json:
- *             schema: { $ref: '#/components/schemas/Error' }
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
  */
 routes.get("/me", authToken, authControllers.getUser.bind(authControllers));
 
