@@ -30,6 +30,7 @@ model User {
   password  String   @db.VarChar(100)
   role      Role
   isActive  Boolean  @default(true)
+  verifiedEmail Boolean @default(false)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 

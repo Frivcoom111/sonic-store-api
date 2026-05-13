@@ -1,5 +1,16 @@
 import type { Role } from "../generated/prisma/client";
 
+export interface IUser {
+  id: string;
+  name: string;
+  email: string;
+  role: Role
+  isActive: boolean;
+  verifiedEmail: boolean;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
 export interface CreateUserDTO {
   name: string;
   email: string;
