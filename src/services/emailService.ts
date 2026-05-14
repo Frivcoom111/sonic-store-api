@@ -30,20 +30,24 @@ class EmailService {
     // Gera um número entre 100000 e 999999
     const code: number = Math.floor(100000 + Math.random() * 900000);
 
-    // Armazena no redis por 5 minutos
     await redis.set(key, code, "EX", 300);
 
-    await transporter.sendMail({
-      from: `"No Reply" <${getRequiredEnv("MAIL_USER")}>`,
-      to: user.email,
-      subject: "Verificação de e-mail",
-      html: `
+    try {
+      await transporter.sendMail({
+        from: `"No Reply" <${getRequiredEnv("MAIL_USER")}>`,
+        to: user.email,
+        subject: "Verificação de e-mail",
+        html: `
                 <h2>Olá, ${user.name}!</h2>
                 <p>Seu código de verificação é:</p>
                 <h1 style="letter-spacing: 8px;">${code}</h1>
                 <p>Este código expira em <strong>5 minutos</strong>.</p>
             `,
-    });
+      });
+    } catch (err) {
+      await redis.del(key);
+      throw err;
+    }
   }
 
   async verifyEmail(id: string, code: number): Promise<void> {

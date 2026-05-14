@@ -84,8 +84,10 @@ class AuthService {
 
     const tokenExpiration: number = exp - Math.floor(Date.now() / 1000);
 
+    const key = `blacklist:token:${String(token)}`
+
     if (tokenExpiration > 0) {
-      await redis.set(String(token), "blacklisted", "EX", tokenExpiration);
+      await redis.set(key, "blacklisted", "EX", tokenExpiration);
     }
   }
 

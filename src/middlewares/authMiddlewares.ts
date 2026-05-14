@@ -17,7 +17,9 @@ export const authToken: RequestHandler = async (req: Request, res: Response, nex
 
     const token = headerAuthorization?.split(" ")[1] as string;
 
-    const tokenBlacklist = await redis.get(token);
+    const key = `blacklist:token:${token}`;
+
+    const tokenBlacklist = await redis.get(key);
 
     if (tokenBlacklist) return next(createError("Token inválido", 401));
 
