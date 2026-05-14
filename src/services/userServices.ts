@@ -12,7 +12,6 @@ import type {
   UserListResponse,
   UserResponse,
 } from "../interfaces/user.interface";
-import { boolean } from "zod";
 
 const userSelect = {
   id: true,

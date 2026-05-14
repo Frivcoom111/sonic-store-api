@@ -16,7 +16,6 @@ import type {
   UserListResponse,
   UserResponse,
 } from "../interfaces/user.interface";
-import { createError } from "../utils/createError";
 
 class UserController {
   async createUser(req: Request, res: Response, next: NextFunction): Promise<void> {
@@ -67,7 +66,7 @@ class UserController {
       const id = req.user?.id;
 
       if (!id) {
-        res.status(401).json({ erro: "ID usuário inválido." });
+        res.status(401).json({ error: "ID usuário inválido." });
         return;
       }
 
