@@ -16,6 +16,7 @@ import type {
   UserListResponse,
   UserResponse,
 } from "../interfaces/user.interface";
+import { createError } from "../utils/createError";
 
 class UserController {
   async createUser(req: Request, res: Response, next: NextFunction): Promise<void> {
@@ -45,15 +46,10 @@ class UserController {
       const page = rawPage === undefined ? 1 : Number.parseInt(rawPage as string, 10);
       const limit = rawLimit === undefined ? 20 : Number.parseInt(rawLimit as string, 10);
 
-      if (
-        !Number.isInteger(page) ||
-        !Number.isInteger(limit) ||
-        page < 1 ||
-        limit < 1 ||
-        limit > 100
-      ) {
+      if (!Number.isInteger(page) || !Number.isInteger(limit) || page < 1 || limit < 1 || limit > 100) {
         res.status(400).json({
-          error: "Parâmetros de paginação inválidos. 'page' deve ser >= 1 e 'limit' deve estar entre 1 e 100.",
+          error:
+            "Parâmetros de paginação inválidos. 'page' deve ser >= 1 e 'limit' deve estar entre 1 e 100.",
         });
         return;
       }
@@ -70,7 +66,10 @@ class UserController {
       const validation = userUpdateSchema.safeParse(req.body);
       const id = req.user?.id;
 
-      if (!id) throw new Error("ID usuário inválido.");
+      if (!id) {
+        res.status(401).json({ erro: "ID usuário inválido." });
+        return;
+      }
 
       if (!validation.success) {
         res.status(400).json({ error: validation.error.format() });
@@ -158,7 +157,12 @@ class UserController {
 
       const userToggle: UserResponse = await userService.toggle({ id: validation.data.id, isActive });
 
-      res.status(200).json({ message: `Usuário ${userToggle.isActive ? "ativado" : "desativado"} com sucesso.`, userToggle });
+      res
+        .status(200)
+        .json({
+          message: `Usuário ${userToggle.isActive ? "ativado" : "desativado"} com sucesso.`,
+          userToggle,
+        });
     } catch (error) {
       next(error);
     }

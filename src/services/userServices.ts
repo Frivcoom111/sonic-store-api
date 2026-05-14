@@ -12,6 +12,7 @@ import type {
   UserListResponse,
   UserResponse,
 } from "../interfaces/user.interface";
+import { boolean } from "zod";
 
 const userSelect = {
   id: true,
@@ -65,7 +66,10 @@ class UserService {
   }
 
   async update(id: string, data: UpdateUserDTO): Promise<UserResponse> {
-    if (data.email) data.email = data.email.toLowerCase().trim();
+    if (data.email) {
+      data.email = data.email.toLowerCase().trim();
+      data.verifiedEmail = false;
+    }
 
     try {
       const updatedUser = await prisma.user.update({

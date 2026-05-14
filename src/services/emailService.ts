@@ -1,4 +1,3 @@
-import { IUser } from "../interfaces/user.interface";
 import transporter from "../lib/mailer";
 import { getRequiredEnv } from "../utils/getRequiredEnv";
 import prisma from "../lib/prisma";
@@ -6,47 +5,73 @@ import redis from "../lib/redis";
 import { createError } from "../utils/createError";
 
 class EmailService {
-    async sendEmail(id: string): Promise<void> {
-        const user: IUser = await prisma.user.findUnique({
-            where: { id: id },
-            select: {
-                id: true,
-                name: true,
-                email: true,
-                role: true,
-                isActive: true,
-                verifiedEmail: true,
-                createdAt: true,
-                updatedAt: true
-            }
-        });
+  async sendEmail(id: string): Promise<void> {
+    const user = await prisma.user.findUnique({
+      where: { id: id },
+      select: {
+        name: true,
+        email: true,
+        verifiedEmail: true,
+      },
+    });
 
-        if (user.verifiedEmail) throw createError("E-mail já verificado.", 400);
+    if (!user) throw createError("Usuário não encontrado.", 404);
 
-        const verification = await redis.get(user.email);
+    if (user.verifiedEmail) throw createError("E-mail já verificado.", 400);
 
-        if (verification) {
-            throw createError("E-mail de verificação já encaminhado.", 400);
-        }
+    const key = `verify:email:${user.email}`;
 
-        // Gera um número entre 100000 e 999999
-        const code: number = Math.floor(100000 + Math.random() * 900000);
+    const verification = await redis.get(key);
 
-        // Armazena no redis por 5 minutos
-        await redis.set(user.email, code, "EX", 300);
+    if (verification) {
+      throw createError("E-mail de verificação já encaminhado.", 400);
+    }
 
-        await transporter.sendMail({
-            from: `"No Reply" <${getRequiredEnv("MAIL_USER")}>`,
-            to: user.email,
-            subject: "Verificação de e-mail",
-            html: `
+    // Gera um número entre 100000 e 999999
+    const code: number = Math.floor(100000 + Math.random() * 900000);
+
+    // Armazena no redis por 5 minutos
+    await redis.set(key, code, "EX", 300);
+
+    await transporter.sendMail({
+      from: `"No Reply" <${getRequiredEnv("MAIL_USER")}>`,
+      to: user.email,
+      subject: "Verificação de e-mail",
+      html: `
                 <h2>Olá, ${user.name}!</h2>
                 <p>Seu código de verificação é:</p>
                 <h1 style="letter-spacing: 8px;">${code}</h1>
                 <p>Este código expira em <strong>5 minutos</strong>.</p>
-            `
-        });
-    }
+            `,
+    });
+  }
+
+  async verifyEmail(id: string, code: number): Promise<void> {
+    const user = await prisma.user.findUnique({
+      where: { id: id },
+      select: {
+        name: true,
+        email: true,
+        verifiedEmail: true,
+      },
+    });
+
+    if (!user) throw createError("Usuário não encontrado.", 404);
+
+    if (user.verifiedEmail) throw createError("E-mail já verificado.", 400);
+
+    const key = `verify:email:${user.email}`
+
+    const savedCode = (await redis.get(key));
+
+    if (!savedCode) throw createError("Código expirado ou não solicitado.", 400);
+
+    if (Number(savedCode) !== code) throw createError("Código digitado inválido.", 400);
+
+    await prisma.user.update({ where: { id: id }, data: { verifiedEmail: true } });
+
+    await redis.del(key);
+  }
 }
 
-export default new EmailService;
+export default new EmailService();
