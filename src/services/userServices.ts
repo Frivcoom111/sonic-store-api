@@ -65,12 +65,21 @@ class UserService {
   }
 
   async update(id: string, data: UpdateUserDTO): Promise<UserResponse> {
-    if (data.email) {
-      data.email = data.email.toLowerCase().trim();
-      data.verifiedEmail = false;
-    }
-
     try {
+      if (data.email) {
+        const normalizedEmail = data.email.toLowerCase().trim();
+        const currentUser = await prisma.user.findUnique({
+          where: { id: id },
+          select: { email: true },
+        });
+
+        data.email = normalizedEmail;
+
+        if (currentUser && currentUser.email !== normalizedEmail) {
+          data.verifiedEmail = false;
+        }
+      }
+
       const updatedUser = await prisma.user.update({
         where: { id: id },
         data,

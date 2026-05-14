@@ -18,10 +18,15 @@ export const authToken: RequestHandler = async (req: Request, res: Response, nex
     const token = headerAuthorization?.split(" ")[1] as string;
 
     const key = `blacklist:token:${token}`;
-
     const tokenBlacklist = await redis.get(key);
 
-    if (tokenBlacklist) return next(createError("Token inválido", 401));
+    // Redis isolado — erro de infra não vira 401 enganoso
+    try {
+      const tokenBlacklist = await redis.get(key);
+      if (tokenBlacklist) return next(createError("Token inválido.", 401));
+    } catch {
+      return next(createError("Erro interno ao validar sessão.", 500));
+    }
 
     const decoded = jwt.verify(token, JWT_SECRET) as jwt.JwtPayload;
 
