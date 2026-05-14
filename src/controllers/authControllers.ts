@@ -50,7 +50,10 @@ class AuthController {
       const decoded = req.user as JwtPayload;
       const exp = decoded.exp;
 
-      if (!exp) throw new Error("Token sem expiração definida.");
+      if (!exp) {
+        res.status(401).json({ error: "Token sem expiração definida." });
+        return;
+      }
 
       await authService.logout(token, exp);
 
@@ -63,7 +66,11 @@ class AuthController {
   async getUser(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
       const id = req.user?.id;
-      if (!id) throw new Error("ID usuário inválido.");
+
+      if (!id) {
+        res.status(401).json({ error: "ID usuário inválido." });
+        return;
+      }
 
       const user: UserResponse = await authService.getUser(id);
 
