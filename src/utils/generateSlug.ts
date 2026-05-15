@@ -1,4 +1,4 @@
-export const generateSlug = (name) => {
+export const generateSlug = (name: string): string => {
   return name
     .toLowerCase() // "Guitarras Elétricas"  → "guitarras elétricas"
     .normalize("NFD") // separa letra + acento  → "guitarras ele\u0301tricas"

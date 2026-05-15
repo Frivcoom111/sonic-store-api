@@ -3,6 +3,8 @@ import { getRequiredEnv } from "../utils/getRequiredEnv";
 import prisma from "../lib/prisma";
 import redis from "../lib/redis";
 import { createError } from "../utils/createError";
+import { generateHash } from "../utils/generateHash";
+import { compareHash } from "../utils/compareHash";
 
 class EmailService {
   async sendEmail(id: string): Promise<void> {
@@ -30,7 +32,9 @@ class EmailService {
     // Gera um número entre 100000 e 999999
     const code: number = Math.floor(100000 + Math.random() * 900000);
 
-    await redis.set(key, code, "EX", 300);
+    const hash: string = await generateHash(String(code));
+
+    await redis.set(key, hash, "EX", 300);
 
     try {
       await transporter.sendMail({
@@ -50,7 +54,7 @@ class EmailService {
     }
   }
 
-  async verifyEmail(id: string, code: number): Promise<void> {
+  async verifyEmail(id: string, code: string): Promise<void> {
     const user = await prisma.user.findUnique({
       where: { id: id },
       select: {
@@ -61,16 +65,17 @@ class EmailService {
     });
 
     if (!user) throw createError("Usuário não encontrado.", 404);
-
     if (user.verifiedEmail) throw createError("E-mail já verificado.", 400);
 
-    const key = `verify:email:${user.email}`
+    const key = `verify:email:${user.email}`;
 
-    const savedCode = (await redis.get(key));
+    const savedCode: string = String(await redis.get(key));
 
     if (!savedCode) throw createError("Código expirado ou não solicitado.", 400);
 
-    if (Number(savedCode) !== code) throw createError("Código digitado inválido.", 400);
+    const isMatch: boolean = await compareHash(code, savedCode);
+
+    if (!isMatch) throw createError("Código digitado inválido.", 400);
 
     await prisma.user.update({ where: { id: id }, data: { verifiedEmail: true } });
 
