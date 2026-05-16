@@ -10,6 +10,7 @@ export interface CreateUserDTO {
 export interface UpdateUserDTO {
   name?: string;
   email?: string;
+  verifiedEmail?: boolean;
 }
 
 export interface UpdateUserPasswordDTO {
@@ -31,6 +32,7 @@ export interface UserResponse {
   email: string;
   role: Role;
   isActive: boolean;
+  verifiedEmail?: boolean
 }
 
 export interface UserListResponse {

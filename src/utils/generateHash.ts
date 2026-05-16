@@ -1,9 +1,8 @@
-import "dotenv/config";
 import bcrypt from "bcrypt";
 import { getRequiredEnv } from "./getRequiredEnv";
 
 const SALT = parseInt(getRequiredEnv("SALT"));
 
-export const generateHashPassword = async (password) => {
-  return await bcrypt.hash(password, SALT);
+export const generateHash = async (value: string): Promise<string> => {
+  return await bcrypt.hash(value, SALT);
 };

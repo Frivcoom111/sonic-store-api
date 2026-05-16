@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { idParamsSchema } from "../../src/validators/globalValidators.js";
+import { idParamsSchema } from "../../../src/validators/globalValidators.js";
 
 describe("idParamsSchema", () => {
   it("aceita UUID válido", () => {

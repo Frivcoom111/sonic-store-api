@@ -1,21 +1,18 @@
 import prisma from "../lib/prisma";
-import { compareHashPassword } from "../utils/compareHashPassword";
-import { generateHashPassword } from "../utils/generateHashPassword";
+import { compareHash } from "../utils/compareHash";
+import { generateHash } from "../utils/generateHash";
 import { generateToken } from "../utils/generateToken";
 import { createError } from "../utils/createError";
 import type { Prisma } from "../generated/prisma/client";
-import type {
-  LoginDTO,
-  LoginResponse,
-  RegisterDTO,
-} from "../interfaces/auth.interface";
+import type { LoginDTO, LoginResponse, RegisterDTO } from "../interfaces/auth.interface";
 import type { UserResponse } from "../interfaces/user.interface";
+import redis from "../lib/redis";
 
 class AuthService {
   async register({ name, email, password }: RegisterDTO): Promise<UserResponse> {
     try {
       const normalizedEmail = email.toLowerCase().trim();
-      const hashPassword = await generateHashPassword(password);
+      const hashPassword = await generateHash(password);
 
       const user = await prisma.user.create({
         data: {
@@ -60,7 +57,7 @@ class AuthService {
     if (!user) throw createError("Email ou senha inválidos.", 401);
     if (!user.isActive) throw createError("Usuário inativo.", 403);
 
-    const isMatch = await compareHashPassword(password, user.password);
+    const isMatch = await compareHash(password, user.password);
     if (!isMatch) throw createError("Email ou senha inválidos.", 401);
 
     const token = generateToken(user);
@@ -75,6 +72,18 @@ class AuthService {
         isActive: user.isActive,
       },
     };
+  }
+
+  async logout(token: string, exp: number): Promise<void> {
+    if (!exp) throw createError("Token sem expiração definida.", 400);
+
+    const tokenExpiration: number = exp - Math.floor(Date.now() / 1000);
+
+    const key = `blacklist:token:${String(token)}`;
+
+    if (tokenExpiration > 0) {
+      await redis.set(key, "blacklisted", "EX", tokenExpiration);
+    }
   }
 
   async getUser(id: string): Promise<UserResponse> {

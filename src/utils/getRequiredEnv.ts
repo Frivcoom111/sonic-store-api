@@ -1,4 +1,4 @@
-export function getRequiredEnv(name) {
+export function getRequiredEnv(name: string): string {
   const value = process.env[name];
 
   if (typeof value !== "string" || value.trim() === "") {

@@ -8,7 +8,7 @@ beforeAll(async () => {
   process.env.JWT_SECRET = "test-jwt-secret";
   process.env.JWT_EXPIRES_IN = "1h";
 
-  ({ generateToken } = await import("../../src/utils/generateToken.js"));
+  ({ generateToken } = await import("../../../src/utils/generateToken.js"));
 });
 
 describe("generateToken", () => {

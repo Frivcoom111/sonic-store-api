@@ -1,6 +1,6 @@
 import prisma from "../lib/prisma";
-import { generateHashPassword } from "../utils/generateHashPassword";
-import { compareHashPassword } from "../utils/compareHashPassword";
+import { generateHash } from "../utils/generateHash";
+import { compareHash } from "../utils/compareHash";
 import { createError } from "../utils/createError";
 import type { Prisma } from "../generated/prisma/client";
 import type {
@@ -25,7 +25,7 @@ class UserService {
   async create({ name, email, password, role }: CreateUserDTO): Promise<UserResponse> {
     try {
       const normalizedEmail = email.toLowerCase().trim();
-      const hashPassword = await generateHashPassword(password);
+      const hashPassword = await generateHash(password);
 
       const user = await prisma.user.create({
         data: {
@@ -55,7 +55,14 @@ class UserService {
       prisma.user.findMany({
         skip,
         take,
-        select: userSelect,
+        select: {
+          id: true,
+          name: true,
+          email: true,
+          role: true,
+          isActive: true,
+          verifiedEmail: true
+        },
         orderBy: { name: "asc" },
       }),
       prisma.user.count(),
@@ -65,9 +72,21 @@ class UserService {
   }
 
   async update(id: string, data: UpdateUserDTO): Promise<UserResponse> {
-    if (data.email) data.email = data.email.toLowerCase().trim();
-
     try {
+      if (data.email) {
+        const normalizedEmail = data.email.toLowerCase().trim();
+        const currentUser = await prisma.user.findUnique({
+          where: { id: id },
+          select: { email: true },
+        });
+
+        data.email = normalizedEmail;
+
+        if (currentUser && currentUser.email !== normalizedEmail) {
+          data.verifiedEmail = false;
+        }
+      }
+
       const updatedUser = await prisma.user.update({
         where: { id: id },
         data,
@@ -95,10 +114,10 @@ class UserService {
 
     if (!userPassword) throw createError("Usuário não encontrado.", 404);
 
-    const isMatch = await compareHashPassword(currentPassword, userPassword.password);
+    const isMatch = await compareHash(currentPassword, userPassword.password);
     if (!isMatch) throw createError("Senha inválida.", 401);
 
-    const hashPassword = await generateHashPassword(newPassword);
+    const hashPassword = await generateHash(newPassword);
 
     const updatedUser = await prisma.user.update({
       where: { id: id },
@@ -134,7 +153,8 @@ class UserService {
     });
 
     if (!user) throw createError("Usuário não encontrado.", 404);
-    if (user.isActive === isActive) throw createError(`Usuário já está ${isActive ? "ativado." : "desativado."}`, 409);
+    if (user.isActive === isActive)
+      throw createError(`Usuário já está ${isActive ? "ativado." : "desativado."}`, 409);
 
     const userToggle = await prisma.user.update({
       where: { id: id },

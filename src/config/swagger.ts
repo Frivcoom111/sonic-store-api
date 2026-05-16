@@ -5,12 +5,13 @@ const { version } = require("../../package.json");
 const swaggerDefinition = {
   openapi: "3.0.0",
   info: {
-    title: "Sonic Store API",
+    title: "Template - API",
     version,
     description: "API REST de e-commerce — Node.js, Express, Prisma, JWT",
   },
   servers: [
     { url: "http://localhost:3000", description: "Desenvolvimento" },
+    { url: "https://api-development-daad.up.railway.app", description: "Produção" },
   ],
   tags: [
     { name: "Auth", description: "Autenticação e sessão" },
