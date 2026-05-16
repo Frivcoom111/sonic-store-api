@@ -23,18 +23,17 @@ class EmailService {
 
     const key = `verify:email:${user.email}`;
 
-    const verification = await redis.get(key);
-
-    if (verification) {
-      throw createError("E-mail de verificação já encaminhado.", 400);
-    }
-
     // Gera um número entre 100000 e 999999
     const code: number = Math.floor(100000 + Math.random() * 900000);
 
     const hash: string = await generateHash(String(code));
 
-    await redis.set(key, hash, "EX", 300);
+    // Armazena no redis por 5 minutos apenas se ainda não existir um código ativo
+    const reserved = await redis.set(key, hash, "EX", 300, "NX");
+
+    if (reserved !== "OK") {
+      throw createError("E-mail de verificação já encaminhado.", 400);
+    }
 
     try {
       await transporter.sendMail({
