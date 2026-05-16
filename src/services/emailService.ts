@@ -69,7 +69,7 @@ class EmailService {
 
     const key = `verify:email:${user.email}`;
 
-    const savedCode: string = String(await redis.get(key));
+    const savedCode = await redis.get(key);
 
     if (!savedCode) throw createError("Código expirado ou não solicitado.", 400);
 

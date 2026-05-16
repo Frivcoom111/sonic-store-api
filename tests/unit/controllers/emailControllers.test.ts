@@ -92,18 +92,18 @@ describe("EmailController.verifyEmail", () => {
   });
 
   it("retorna 200 e chama service com id e code corretos", async () => {
-    const req = { user: { id: "id-1" }, body: { code: 482931 } } as unknown as Request;
+    const req = { user: { id: "id-1" }, body: { code: "482931" } } as unknown as Request;
     const res = makeRes();
     serviceMock.verifyEmail.mockResolvedValue(undefined);
 
     await emailControllers.verifyEmail(req, res, next);
 
-    expect(serviceMock.verifyEmail).toHaveBeenCalledWith("id-1", 482931);
+    expect(serviceMock.verifyEmail).toHaveBeenCalledWith("id-1", "482931");
     expect(res.status).toHaveBeenCalledWith(200);
   });
 
   it("repassa erro ao next quando service lança", async () => {
-    const req = { user: { id: "id-1" }, body: { code: 482931 } } as unknown as Request;
+    const req = { user: { id: "id-1" }, body: { code: "482931" } } as unknown as Request;
     const res = makeRes();
     const error = new Error("falha na verificação");
     serviceMock.verifyEmail.mockRejectedValue(error);

@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { registerSchema, loginSchema } from '../../src/validators/authValidators.js';
+import { registerSchema, loginSchema } from '../../../src/validators/authValidators.js';
 
 describe('registerSchema', () => {
   it('aceita dados válidos', () => {

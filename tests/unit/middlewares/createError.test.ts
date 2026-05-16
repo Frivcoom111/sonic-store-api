@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { createError } from '../../src/utils/createError.js';
+import { createError } from '../../../src/utils/createError.js';
 
 describe('createError', () => {
   it('cria um erro com mensagem correta', () => {

@@ -55,7 +55,14 @@ class UserService {
       prisma.user.findMany({
         skip,
         take,
-        select: userSelect,
+        select: {
+          id: true,
+          name: true,
+          email: true,
+          role: true,
+          isActive: true,
+          verifiedEmail: true
+        },
         orderBy: { name: "asc" },
       }),
       prisma.user.count(),

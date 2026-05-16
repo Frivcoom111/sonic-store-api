@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { generateSlug } from "../../src/utils/generateSlug.js";
+import { generateSlug } from "../../../src/utils/generateSlug.js";
 
 describe("generateSlug", () => {
   it("Converte espaços em hífens", () => {
