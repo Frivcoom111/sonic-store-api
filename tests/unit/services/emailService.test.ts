@@ -97,7 +97,8 @@ describe("EmailService.sendEmail", () => {
       `verify:email:${activeUser.email}`,
       "hashed_code",
       "EX",
-      300
+      300,
+      "NX"
     );
     expect(mailerMock.sendMail).toHaveBeenCalledWith(
       expect.objectContaining({ to: activeUser.email })
