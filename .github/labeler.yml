@@ -1,0 +1,49 @@
+controllers:
+  - changed-files:
+    - any-glob-to-any-file: 'src/controllers/**'
+
+services:
+  - changed-files:
+    - any-glob-to-any-file: 'src/services/**'
+
+routes:
+  - changed-files:
+    - any-glob-to-any-file: 'src/routes/**'
+
+middlewares:
+  - changed-files:
+    - any-glob-to-any-file: 'src/middlewares/**'
+
+validators:
+  - changed-files:
+    - any-glob-to-any-file: 'src/validators/**'
+
+interfaces:
+  - changed-files:
+    - any-glob-to-any-file: 'src/interfaces/**'
+
+utils:
+  - changed-files:
+    - any-glob-to-any-file: 'src/utils/**'
+
+database:
+  - changed-files:
+    - any-glob-to-any-file: 'prisma/**'
+
+tests:
+  - changed-files:
+    - any-glob-to-any-file: 'tests/**'
+
+docs:
+  - changed-files:
+    - any-glob-to-any-file: 'docs/**'
+    - any-glob-to-any-file: '*.md'
+
+config:
+  - changed-files:
+    - any-glob-to-any-file: 'src/config/**'
+    - any-glob-to-any-file: 'src/lib/**'
+    - any-glob-to-any-file: '*.json'
+    - any-glob-to-any-file: '*.ts'
+    - any-glob-to-any-file: 'Dockerfile'
+    - any-glob-to-any-file: 'docker-compose.yml'
